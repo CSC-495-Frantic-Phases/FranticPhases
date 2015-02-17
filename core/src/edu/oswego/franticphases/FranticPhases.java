@@ -15,38 +15,46 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.nextpeer.libgdx.NextpeerPlugin;
+import com.nextpeer.libgdx.Tournaments;
+import com.nextpeer.libgdx.TournamentsCallback;
 
 import edu.oswego.franticphases.screens.*;
 
 public class FranticPhases extends Game {
 	
 	Stack<Screen> screenStack = new Stack<Screen>();
-	private AssetManager assetManager;
+	//private AssetManager assetManager;
 	private GameScreen gameScreen;
 	private MainScreen mainScreen;
 	private Stage stage;
 	private Skin skin;
+
 	
 	SpriteBatch batch;
 	Texture img;
 	private int width;
 	private int height;
 	
+	public FranticPhases() {
+
+	}
+	 
+	public FranticPhases(Tournaments tournaments) {
+	    // If we have a supported tournaments object, set the game as callback
+	    if (tournaments != null && tournaments.isSupported()) {
+	        tournaments.setTournamentsCallback(mNextpeerTournamentsCallback);
+	         
+	        // Load Nextpeer plugin with the tournaments instance
+	        NextpeerPlugin.load(tournaments);
+	    }
+	}
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		//img = new Texture("badlogic.jpg");
 		loadSkin();
-		
-		// this will set the view port to the screen size, which will cause
-		// things to look big on a low resolution screen and look small on a
-		// high resolution screen. we then probably have to scale the ui
-		// up or down to make things easier to see. If we just hard code
-		// a size then the game engine will just scale the entire render view
-		// to the correct size.
-		//
-		// width = Gdx.graphics.getWidth();
-		// height = Gdx.graphics.getHeight();
 
 		width = 480;
 		height = 320;
@@ -57,11 +65,12 @@ public class FranticPhases extends Game {
 	}
 	
 	private void loadSkin() {
-		assetManager.load("data/ui/skin.json", Skin.class,
-				new SkinLoader.SkinParameter("data/ui/franticphases.pack"));
-		assetManager.finishLoading();
+		//assetManager.load("data/ui/skin.json", Skin.class,
+			//	new SkinLoader.SkinParameter("data/ui/franticphases.pack"));
+	//	assetManager.finishLoading();
 
-		skin = assetManager.get("data/ui/skin.json", Skin.class);
+		//skin = assetManager.get("data/ui/skin.json", Skin.class);
+		skin = new Skin(Gdx.files.internal("uiskin.json"));
 	}
 	
 	public void showMainScreen() {
@@ -116,13 +125,25 @@ public class FranticPhases extends Game {
 		batch.dispose();
 
 	}
-
-	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
-	}
+	
+    private TournamentsCallback mNextpeerTournamentsCallback = new TournamentsCallback() {
+		
+		@Override
+		public void onTournamentStart(long tournamentRandomSeed) {
+	        // Start the game scene
+	        NextpeerPlugin.instance().lastKnownTournamentRandomSeed = tournamentRandomSeed;
+	        showGameScreen();
+	        //setScreen(new GameScreen(FranticPhases.this));
+		}
+		
+		@Override
+		public void onTournamentEnd() {
+	        // End the game scene, switch to main menu
+	        NextpeerPlugin.instance().lastKnownTournamentRandomSeed = 0;
+	        showMainScreen();
+	        //setScreen(new MainScreen(FranticPhases.this));
+		}
+	};
+	
+	
 }

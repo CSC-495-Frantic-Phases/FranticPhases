@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.nextpeer.libgdx.NextpeerPlugin;
 
 import edu.oswego.franticphases.FranticPhases;
 
@@ -54,7 +55,15 @@ public class MainScreen extends AbstractScreen  {
 	        play.addListener(new ChangeListener() {
 	            @Override
 	            public void changed(ChangeEvent event, Actor actor) {
-	                game.showGameScreen();
+	            	if (NextpeerPlugin.isAvailable()) {
+	            		 
+	                    NextpeerPlugin.launch();
+	                }
+	                // Else, we don't have tournament mode, run the game normally
+	                else {
+	                	game.showGameScreen();
+	                }
+	            	//game.showGameScreen();
 	            }
 	        });
 		

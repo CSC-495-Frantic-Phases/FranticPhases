@@ -5,20 +5,29 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.nextpeer.libgdx.NextpeerPlugin;
+import com.oswego.franticphases.settings.Settings;
 
 import edu.oswego.franticphases.FranticPhases;
+import edu.oswego.franticphases.datasending.DataSender;
+import edu.oswego.franticphases.datasending.WebCallback;
+import edu.oswego.franticphases.dialogs.LoginDialog;
 
 
 
 public class MainScreen extends AbstractScreen  {
 
+	
+	private WebCallback autoLoginCallBack;
+	private boolean isAutoLogging = false;
+	
+	private String feedBacktext = "";
 	
     public MainScreen(final FranticPhases game) {
         super(game);
@@ -40,6 +49,8 @@ public class MainScreen extends AbstractScreen  {
         Gdx.input.setInputProcessor(multiplexer);
         Gdx.input.setCatchBackKey(true);
         
+
+        
 		Window window = new Window("\nFrantic Phases", skin);
 	        window.setFillParent(true);
 	        window.setModal(true);
@@ -55,18 +66,18 @@ public class MainScreen extends AbstractScreen  {
 	        play.addListener(new ChangeListener() {
 	            @Override
 	            public void changed(ChangeEvent event, Actor actor) {
-	            	if (NextpeerPlugin.isAvailable()) {
-	            		 
-	                    NextpeerPlugin.launch();
-	                }
-	                // Else, we don't have tournament mode, run the game normally
-	                else {
-	                	game.showGameScreen();
-	                }
-	            	//game.showGameScreen();
+	                if (!Settings.getUsername().equals("")){
+	        			autoLoginCallBack = new WebCallback();
+	        			DataSender aSender = new DataSender();
+	        			aSender.login(Settings.getUsername(), Settings.getPassword(), autoLoginCallBack);
+	        			isAutoLogging = true;
+	        		}else{
+	        			Dialog ld = new LoginDialog("Login", skin, game).show(game.getStage());
+	        		}
 	            }
 	        });
 		
 	}
+	
 
 }

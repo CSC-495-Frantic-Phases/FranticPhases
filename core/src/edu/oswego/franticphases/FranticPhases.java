@@ -15,9 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
-import com.nextpeer.libgdx.NextpeerPlugin;
-import com.nextpeer.libgdx.Tournaments;
-import com.nextpeer.libgdx.TournamentsCallback;
+import com.oswego.franticphases.settings.Settings;
 
 import edu.oswego.franticphases.screens.*;
 
@@ -27,6 +25,8 @@ public class FranticPhases extends Game {
 	//private AssetManager assetManager;
 	private GameScreen gameScreen;
 	private MainScreen mainScreen;
+	private LoginScreen loginScreen;
+	private CreateAccountScreen caScreen;
 	private Stage stage;
 	private Skin skin;
 
@@ -36,26 +36,13 @@ public class FranticPhases extends Game {
 	private int width;
 	private int height;
 	
-	public FranticPhases() {
-
-	}
-	 
-	public FranticPhases(Tournaments tournaments) {
-	    // If we have a supported tournaments object, set the game as callback
-	    if (tournaments != null && tournaments.isSupported()) {
-	        tournaments.setTournamentsCallback(mNextpeerTournamentsCallback);
-	         
-	        // Load Nextpeer plugin with the tournaments instance
-	        NextpeerPlugin.load(tournaments);
-	    }
-	}
+	
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		//img = new Texture("badlogic.jpg");
+		Settings.Init();
 		loadSkin();
-
 		width = 480;
 		height = 320;
 		ScalingViewport svp = new ScalingViewport(Scaling.stretch, width, height);
@@ -92,6 +79,24 @@ public class FranticPhases extends Game {
 		setScreen(gameScreen);
 	}
 	
+	public void showLoginScreen() {
+		if (loginScreen != null) {
+			loginScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		loginScreen = new LoginScreen(this);
+		setScreen(loginScreen);
+	}
+	
+	public void showCreateAccountScreen() {
+		if (caScreen != null) {
+			caScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		caScreen = new CreateAccountScreen(this);
+		setScreen(caScreen);
+	}
+	
 	public void showPreviousScreen() {
 		if(screenStack.peek() != gameScreen){
 		}
@@ -125,25 +130,6 @@ public class FranticPhases extends Game {
 		batch.dispose();
 
 	}
-	
-    private TournamentsCallback mNextpeerTournamentsCallback = new TournamentsCallback() {
-		
-		@Override
-		public void onTournamentStart(long tournamentRandomSeed) {
-	        // Start the game scene
-	        NextpeerPlugin.instance().lastKnownTournamentRandomSeed = tournamentRandomSeed;
-	        showGameScreen();
-	        //setScreen(new GameScreen(FranticPhases.this));
-		}
-		
-		@Override
-		public void onTournamentEnd() {
-	        // End the game scene, switch to main menu
-	        NextpeerPlugin.instance().lastKnownTournamentRandomSeed = 0;
-	        showMainScreen();
-	        //setScreen(new MainScreen(FranticPhases.this));
-		}
-	};
 	
 	
 }

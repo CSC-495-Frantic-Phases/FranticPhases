@@ -11,8 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.nextpeer.libgdx.NextpeerPlugin;
-
 import edu.oswego.franticphases.FranticPhases;
 
 
@@ -56,8 +54,7 @@ public class GameScreen extends AbstractScreen  {
         play.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-            	NextpeerPlugin.reportScoreForCurrentTournament(score);
-            	score = score +1;
+            	
             }
         });
 		

@@ -5,6 +5,9 @@
     android:versionName="1.0" >
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="20" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Optional - Used to check if an internet connection is available prior to make network requests -->
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -21,6 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.nextpeer.android.NextpeerActivity"></activity>
     </application>
 
 </manifest>

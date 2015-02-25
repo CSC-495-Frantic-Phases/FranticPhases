@@ -24,7 +24,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.nextpeer.android.NextpeerActivity"></activity>
-    </application>
-
+        <activity
+            android:name="edu.oswego.franticphases.Register"
+            android:label="@string/app_name"  >
+        </activity>
+        <activity
+            android:name="edu.oswego.franticphases.AddComment"
+            android:label="@string/app_name"  >
+        </activity>
+         <activity
+            android:name="edu.oswego.franticphases.ReadComments"
+            android:label="@string/app_name"  >
+        </activity>
+   </application>        
 </manifest>

@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.oswego.franticphases.settings.Settings;
 
 import edu.oswego.franticphases.FranticPhases;
+import edu.oswego.franticphases.Settings;
 import edu.oswego.franticphases.datasending.DataSender;
 import edu.oswego.franticphases.datasending.WebCallback;
 

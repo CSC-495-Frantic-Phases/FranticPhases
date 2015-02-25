@@ -3,9 +3,9 @@ package edu.oswego.franticphases.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.oswego.franticphases.settings.Settings;
 
 import edu.oswego.franticphases.FranticPhases;
+import edu.oswego.franticphases.Settings;
 import edu.oswego.franticphases.datasending.DataSender;
 import edu.oswego.franticphases.datasending.WebCallback;
 
@@ -27,7 +27,7 @@ public class CreateAccountScreen extends AbstractScreen implements TextInputList
 
 	@Override
 	public void show() {
-		Window window = new Window("\nLogin Screen", skin);
+		Window window = new Window("\nCreate Account Screen", skin);
         window.setFillParent(true);
         window.setModal(true);
         window.setMovable(false);

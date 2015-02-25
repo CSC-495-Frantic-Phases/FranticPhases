@@ -1,5 +1,6 @@
 package edu.oswego.franticphases.datasending;
 
+import java.io.InputStream;
 import java.util.HashMap;
 
 import sun.awt.windows.ThemeReader;
@@ -10,120 +11,42 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.net.HttpParametersUtils;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
+
+import edu.oswego.franticphases.gamelogic.Handler;
 
 public class DataSender {
 	
 	public DataSender(){
 
 	}
-	
-	public void sendPlayerMove(String _data, String _username, int _turn, int _matchID,
-			String _opponent, final WebCallback _theCallback){
-		HashMap<String, String> parameters = new HashMap<String,String>();
-		parameters.put("user", _username);
-		parameters.put("turn", ""+_turn);
-		parameters.put("data", _data);
-		parameters.put("matchID", "" +_matchID);
-		parameters.put("opponent", _opponent);
-		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		//httpPost.setUrl("http://192.168.1.114/addPlayerMove.php");
-		httpPost.setUrl("");
-		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
-		
-		 Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
-		        public void handleHttpResponse(HttpResponse httpResponse) {
-		        	String shttpResponse = httpResponse.getResultAsString();
-	        		parseData(shttpResponse, _theCallback);
-		        }
-		 
-		        public void failed(Throwable t) {
-		        		System.out.println("Failed " + t.getMessage());
-		        }
 
-				@Override
-				public void cancelled() {
-					// TODO Auto-generated method stub
-					
-				}
-		 });
-	}
-	
-	public void getPlayerMove(int _matchID, String _PlayerMove, int _turn, final WebCallback _theCallback){
-		HashMap<String, String> parameters = new HashMap<String,String>();
-		parameters.put("matchID", "" +_matchID);
-		parameters.put("playerName", _PlayerMove);
-		parameters.put("turn", "" +_turn);
-		
-		HttpRequest httpGet = new HttpRequest(HttpMethods.POST);
-		//httpGet.setUrl("http://192.168.1.114/getMove.php");
-		httpGet.setUrl(" ");
-		httpGet.setContent(HttpParametersUtils.convertHttpParameters(parameters));
-		
-		 Gdx.net.sendHttpRequest (httpGet, new HttpResponseListener() {
-		        public void handleHttpResponse(HttpResponse httpResponse) {	
-		        	String shttpResponse = httpResponse.getResultAsString();
-	        		parseData(shttpResponse, _theCallback);
-
-		        }
-		 
-		        public void failed(Throwable t) {
-		        		System.out.println("failed in getPlayerMove");
-		                //do stuff here based on the failed attempt
-		        }
-
-				@Override
-				public void cancelled() {
-					// TODO Auto-generated method stub
-					
-				}
-		 });
-	}
-	
-	public void createNewMatch(String _player1, String _player2, long _seed,final WebCallback _theCallback){
-		HashMap<String, String> parameters = new HashMap<String,String>();
-		parameters.put("player1", _player1);
-		parameters.put("player2", _player2);
-		parameters.put("seed", ""+_seed);
-		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		//httpPost.setUrl("http://192.168.1.114/createNewMatch.php");
-		httpPost.setUrl(" ");
-		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
-		
-		 Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
-		        public void handleHttpResponse(HttpResponse httpResponse) {
-		        	String shttpResponse = httpResponse.getResultAsString();
-	        		parseData(shttpResponse, _theCallback);
-		        }
-		 
-		        public void failed(Throwable t) {
-		        		System.out.println("Failed in Create new match " + t.getMessage());
-		        }
-
-				@Override
-				public void cancelled() {
-					// TODO Auto-generated method stub
-					
-				}
-		 });
-	}
 	
 	public void createNewAccount(String _name, String _password, final WebCallback _theCallback){
 		HashMap<String, String> parameters = new HashMap<String,String>();
 		parameters.put("username", _name);
 		parameters.put("password", _password);
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		//httpPost.setUrl("http://192.168.1.114/createNewAccount.php");
-		httpPost.setUrl(" ");
+		httpPost.setUrl("http://localhost/webservice/register.php");
+		//httpPost.setUrl(" ");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
-		System.out.println("name: " +_name);
+		System.out.println("username: " +_name);
 		 Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
-		        		String shttpResponse = httpResponse.getResultAsString();
-		        		parseData(shttpResponse, _theCallback);
+		        		//String shttpResponse = httpResponse.getResultAsString();
+		        		//System.out.println("The response is: "+shttpResponse);
+		        		InputStream is = httpResponse.getResultAsStream();
+		        		JsonReader jr = new JsonReader();
+		        		JsonValue jsonVal = jr.parse(is);
+		        		System.out.println("Json from create: "+jsonVal.toString());
+		        		parseLoginData(jsonVal, _theCallback);
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed " + t.getMessage());
+		        		System.out.println("DSFailed " + t.getMessage());
 		        }
 
 				@Override
@@ -139,13 +62,16 @@ public class DataSender {
 		parameters.put("username", _name);
 		parameters.put("password", _password);
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		//httpPost.setUrl("http://192.168.1.114/accountLogin.php");
-		httpPost.setUrl(" ");
+		httpPost.setUrl("http://localhost/webservice/login.php");
+		System.out.println("username: " +_name);
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
 		Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
-	        		String shttpResponse = httpResponse.getResultAsString();
-	        		parseData(shttpResponse, _theCallback);
+		        	InputStream is = httpResponse.getResultAsStream();
+	        		JsonReader jr = new JsonReader();
+	        		JsonValue jsonVal = jr.parse(is);
+	        		System.out.println("Json from login: "+jsonVal.toString());
+	        		parseLoginData(jsonVal, _theCallback);
 
 		        }
 		 
@@ -161,22 +87,27 @@ public class DataSender {
 		 });
 	}
 	
-	public void getPlayerMatches(String _name, final WebCallback _theCallback){
-		HashMap<String, String> parameters = new HashMap<String,String>();
-		parameters.put("player1", _name);
+	public void getAllUserNames(final WebCallback _theCallback, final Handler handler){
+		//HashMap<String, String> parameters = new HashMap<String,String>();
+		//parameters.put("username", _name);
+		//parameters.put("password", _password);
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		//httpPost.setUrl("http://192.168.1.114/getPlayerMatches.php");
-		httpPost.setUrl(" ");
-		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
-		
+		httpPost.setUrl("http://localhost/webservice/usertest.php");
+		//System.out.println("username: " +_name);
+		//httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
 		Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
-	        		String shttpResponse = httpResponse.getResultAsString();
-	        		parseData(shttpResponse, _theCallback);
+		        	InputStream is = httpResponse.getResultAsStream();
+	        		JsonReader jr = new JsonReader();
+	        		JsonValue jsonVal = jr.parse(is);
+	        		System.out.println("Json from users: "+jsonVal.toString());
+	        		parseUserData(jsonVal, _theCallback, handler);
+	        		
+
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed " + t.getMessage());
+		        		System.out.println("User test Failed " + t.getMessage());
 		        }
 
 				@Override
@@ -187,23 +118,39 @@ public class DataSender {
 		 });
 	}
 	
-	private void parseData(String _theResult, WebCallback _theCallback){
-		String[] response = _theResult.split(",");
-		
-		boolean result;
-		
-		if (response[0].equals("Success")){
-			result = true;
-		}else{
-			result = false;
-		}
-		
+	
+	private void parseLoginData(JsonValue theResult, WebCallback _theCallback){
+		boolean result = theResult.getBoolean("success");
 		String message = "";
 		
-		if (response.length > 1){
-			message = response[1];
+		if (result){
+			message = theResult.getString("message");
+			//System.out.println(message);
 		}
 		
 		_theCallback.setData(result, message);
+	}
+	
+	private void parseUserData(JsonValue theResult, WebCallback _theCallback, Handler handler){
+		//String[] usersArray = theResult.get("usernames").asStringArray();
+		boolean result = theResult.getBoolean("success");
+		String message = "";
+		String users = "";
+		
+		if (result){
+			System.out.println("Result is true");
+			message = theResult.getString("message");
+			JsonValue tmp = theResult.get("usernames");
+			System.out.println(tmp.size);
+			handler.sendUsersToGameScreen(tmp);
+			for(int i = 0; i < tmp.size; i++){
+				JsonValue jvtmp = tmp.get(i);
+				System.out.println("ID: " + jvtmp.getString("id") +" Name: "+ jvtmp.getString("username"));
+			}
+			
+		}
+		
+		_theCallback.setData(result, message);
+		
 	}
 }

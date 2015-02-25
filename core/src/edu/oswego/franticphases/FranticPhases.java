@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
-import com.oswego.franticphases.settings.Settings;
 
 import edu.oswego.franticphases.screens.*;
 

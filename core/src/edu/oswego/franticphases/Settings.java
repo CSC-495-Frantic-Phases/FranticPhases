@@ -1,4 +1,4 @@
-package com.oswego.franticphases.settings;
+package edu.oswego.franticphases;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;

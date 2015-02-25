@@ -12,9 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.oswego.franticphases.settings.Settings;
 
 import edu.oswego.franticphases.FranticPhases;
+import edu.oswego.franticphases.Settings;
 import edu.oswego.franticphases.datasending.DataSender;
 import edu.oswego.franticphases.datasending.WebCallback;
 import edu.oswego.franticphases.dialogs.LoginDialog;
@@ -25,9 +25,9 @@ public class MainScreen extends AbstractScreen  {
 
 	
 	private WebCallback autoLoginCallBack;
-	private boolean isAutoLogging = false;
+	//private boolean isAutoLogging = false;
 	
-	private String feedBacktext = "";
+	//private String feedBacktext = "";
 	
     public MainScreen(final FranticPhases game) {
         super(game);
@@ -70,7 +70,8 @@ public class MainScreen extends AbstractScreen  {
 	        			autoLoginCallBack = new WebCallback();
 	        			DataSender aSender = new DataSender();
 	        			aSender.login(Settings.getUsername(), Settings.getPassword(), autoLoginCallBack);
-	        			isAutoLogging = true;
+	        			//isAutoLogging = true;
+	        			game.showGameScreen();
 	        		}else{
 	        			Dialog ld = new LoginDialog("Login", skin, game).show(game.getStage());
 	        		}

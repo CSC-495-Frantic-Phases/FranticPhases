@@ -30,10 +30,11 @@ public class DataSender {
 		parameters.put("username", _name);
 		parameters.put("password", _password);
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		httpPost.setUrl("http://localhost/webservice/register.php");
+		httpPost.setUrl("http://localhost:1234/webservice/register.php");
+		//httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/register.php");
 		//httpPost.setUrl(" ");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
-		System.out.println("username: " +_name);
+		//System.out.println("username: " +_name);
 		 Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
 		        		//String shttpResponse = httpResponse.getResultAsString();
@@ -41,7 +42,7 @@ public class DataSender {
 		        		InputStream is = httpResponse.getResultAsStream();
 		        		JsonReader jr = new JsonReader();
 		        		JsonValue jsonVal = jr.parse(is);
-		        		System.out.println("Json from create: "+jsonVal.toString());
+		        		//System.out.println("Json from create: "+jsonVal.toString());
 		        		parseLoginData(jsonVal, _theCallback);
 		        }
 		 
@@ -62,21 +63,53 @@ public class DataSender {
 		parameters.put("username", _name);
 		parameters.put("password", _password);
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		httpPost.setUrl("http://localhost/webservice/login.php");
-		System.out.println("username: " +_name);
+		httpPost.setUrl("http://localhost:1234/webservice/login.php");
+		//httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/login.php");
+		//System.out.println("username: " +_name);
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
 		Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
 		        	InputStream is = httpResponse.getResultAsStream();
 	        		JsonReader jr = new JsonReader();
 	        		JsonValue jsonVal = jr.parse(is);
-	        		System.out.println("Json from login: "+jsonVal.toString());
+	        		//System.out.println("Json from login: "+jsonVal.toString());
 	        		parseLoginData(jsonVal, _theCallback);
 
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed " + t.getMessage());
+		        		System.out.println("Failed in login" + t.getMessage());
+		        }
+
+				@Override
+				public void cancelled() {
+					// TODO Auto-generated method stub
+					
+				}
+		 });
+	}
+	
+	public void getGames(String _name, final WebCallback _theCallback, final Handler handler){
+		HashMap<String, String> parameters = new HashMap<String,String>();
+		parameters.put("username", _name);
+
+		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
+		httpPost.setUrl("http://localhost:1234/webservice/getGames.php");
+		//httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/login.php");
+		//System.out.println("username: " +_name);
+		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
+		Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
+		        public void handleHttpResponse(HttpResponse httpResponse) {
+		        	InputStream is = httpResponse.getResultAsStream();
+	        		JsonReader jr = new JsonReader();
+	        		JsonValue jsonVal = jr.parse(is);
+	        		System.out.println("Json from get games: "+jsonVal.toString());
+	        		parseGameData(jsonVal, _theCallback, handler);
+
+		        }
+		 
+		        public void failed(Throwable t) {
+		        		System.out.println("Failed in get games " + t.getMessage());
 		        }
 
 				@Override
@@ -88,13 +121,10 @@ public class DataSender {
 	}
 	
 	public void getAllUserNames(final WebCallback _theCallback, final Handler handler){
-		//HashMap<String, String> parameters = new HashMap<String,String>();
-		//parameters.put("username", _name);
-		//parameters.put("password", _password);
+
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		httpPost.setUrl("http://localhost/webservice/usertest.php");
-		//System.out.println("username: " +_name);
-		//httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
+		httpPost.setUrl("http://localhost:1234/webservice/usertest.php");
+		//httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/usertest.php");
 		Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
 		        	InputStream is = httpResponse.getResultAsStream();
@@ -122,13 +152,36 @@ public class DataSender {
 	private void parseLoginData(JsonValue theResult, WebCallback _theCallback){
 		boolean result = theResult.getBoolean("success");
 		String message = "";
+		String id = "";
 		
 		if (result){
 			message = theResult.getString("message");
+			id = theResult.getString("id");
 			//System.out.println(message);
+			System.out.println("ID: "+id);
 		}
 		
+		_theCallback.setData(result, message, id);
+	}
+	
+	private void parseGameData(JsonValue theResult, WebCallback _theCallback, Handler handler){
+		boolean result = theResult.getBoolean("success");
+		String message = "";
+		//JsonValue tmp = theResult;
+		
+		if (result){
+			message = theResult.getString("message");
+			//id = theResult.getString("id");
+			//System.out.println(message);
+			//System.out.println("ID: "+id);
+			JsonValue tmp = theResult.get("games");
+			//System.out.println(tmp.toString());
+			handler.setGamesJson(tmp);
+
+		}else{
+		
 		_theCallback.setData(result, message);
+		}
 	}
 	
 	private void parseUserData(JsonValue theResult, WebCallback _theCallback, Handler handler){
@@ -143,10 +196,10 @@ public class DataSender {
 			JsonValue tmp = theResult.get("usernames");
 			System.out.println(tmp.size);
 			handler.sendUsersToGameScreen(tmp);
-			for(int i = 0; i < tmp.size; i++){
-				JsonValue jvtmp = tmp.get(i);
-				System.out.println("ID: " + jvtmp.getString("id") +" Name: "+ jvtmp.getString("username"));
-			}
+//			for(int i = 0; i < tmp.size; i++){
+//				JsonValue jvtmp = tmp.get(i);
+//				System.out.println("ID: " + jvtmp.getString("id") +" Name: "+ jvtmp.getString("username"));
+//			}
 			
 		}
 		

@@ -2,13 +2,9 @@ package edu.oswego.franticphases;
 
 import java.util.Stack;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.SkinLoader;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,9 +12,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
-import edu.oswego.franticphases.screens.*;
+import edu.oswego.franticphases.screens.CreateAccountScreen;
+import edu.oswego.franticphases.screens.GameScreen;
+import edu.oswego.franticphases.screens.GameSelectScreen;
+import edu.oswego.franticphases.screens.HelpScreen;
+import edu.oswego.franticphases.screens.LoginScreen;
+import edu.oswego.franticphases.screens.MainScreen;
+import edu.oswego.franticphases.screens.SettingsScreen;
+import edu.oswego.franticphases.settings.Settings;
+import edu.oswego.franticphases.settings.SettingsObserver;
+import edu.oswego.franticphases.settings.SettingsUpdate;
 
-public class FranticPhases extends Game {
+
+public class FranticPhases extends Game implements SettingsObserver{
 	
 	Stack<Screen> screenStack = new Stack<Screen>();
 	//private AssetManager assetManager;
@@ -26,6 +32,11 @@ public class FranticPhases extends Game {
 	private MainScreen mainScreen;
 	private LoginScreen loginScreen;
 	private CreateAccountScreen caScreen;
+	private SettingsScreen settingsScreen;
+	private HelpScreen helpScreen;
+	private GameSelectScreen gsScreen;
+	
+	private Settings settings;
 	private Stage stage;
 	private Skin skin;
 
@@ -40,7 +51,8 @@ public class FranticPhases extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		Settings.Init();
+		settings = new Settings();
+		settings.addObserver(this);
 		loadSkin();
 		width = 480;
 		height = 320;
@@ -51,11 +63,6 @@ public class FranticPhases extends Game {
 	}
 	
 	private void loadSkin() {
-		//assetManager.load("data/ui/skin.json", Skin.class,
-			//	new SkinLoader.SkinParameter("data/ui/franticphases.pack"));
-	//	assetManager.finishLoading();
-
-		//skin = assetManager.get("data/ui/skin.json", Skin.class);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 	}
 	
@@ -96,11 +103,43 @@ public class FranticPhases extends Game {
 		setScreen(caScreen);
 	}
 	
+	public void showHelpScreen() {
+		if (helpScreen != null) {
+			helpScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		helpScreen = new HelpScreen(this);
+		setScreen(helpScreen);
+	}
+	
+	public void showGameSelectionScreen() {
+		if (gsScreen != null) {
+			gsScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		gsScreen = new GameSelectScreen(this);
+		setScreen(gsScreen);
+	}
+	
+	public void showSettingsScreen() {
+		if (settingsScreen != null) {
+			settingsScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		settingsScreen = new SettingsScreen(this);
+		setScreen(settingsScreen);
+	}
+	
 	public void showPreviousScreen() {
 		if(screenStack.peek() != gameScreen){
 		}
 		setScreen(screenStack.pop());
 	}
+	
+	public Settings getSettings() {
+		return settings;
+	}
+	
 	public Skin getSkin() {
 		return skin;
 	}
@@ -125,9 +164,33 @@ public class FranticPhases extends Game {
 		if (gameScreen != null) {
 			gameScreen.dispose();
 		}
+		if (helpScreen != null) {
+			helpScreen.dispose();
+		}
+		if (settingsScreen != null) {
+			settingsScreen.dispose();
+		}
+		if (loginScreen != null) {
+			loginScreen.dispose();
+		}
+		if (caScreen != null) {
+			caScreen.dispose();
+		}
 		stage.dispose();
 		batch.dispose();
 
+	}
+	
+	@Override
+	public void handleSettingsChangeUpdate(SettingsUpdate update) {
+//		if (update.getSetting() == Settings.MUSIC) {
+//			playMusic = update.getValue();
+//			if (playMusic) {
+//				playMusic();
+//			} else {
+//				endMusic();
+//			}
+//		}
 	}
 	
 	

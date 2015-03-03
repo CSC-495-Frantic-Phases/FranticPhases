@@ -5,9 +5,9 @@ import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
 import edu.oswego.franticphases.FranticPhases;
-import edu.oswego.franticphases.Settings;
 import edu.oswego.franticphases.datasending.DataSender;
 import edu.oswego.franticphases.datasending.WebCallback;
+import edu.oswego.franticphases.settings.Settings;
 
 
 public class CreateAccountScreen extends AbstractScreen implements TextInputListener {
@@ -74,7 +74,7 @@ public class CreateAccountScreen extends AbstractScreen implements TextInputList
 				if(accountCreationCB.getResult()){
 					Settings.setUsername(username);
 					Settings.setPassword(password);
-					game.showGameScreen();
+					game.showGameSelectionScreen();
 					waitingForResponse = false;
 				}else{
 					game.showMainScreen();

@@ -14,22 +14,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 
 import edu.oswego.franticphases.FranticPhases;
-import edu.oswego.franticphases.Settings;
 import edu.oswego.franticphases.datasending.DataSender;
 import edu.oswego.franticphases.datasending.WebCallback;
 import edu.oswego.franticphases.gamelogic.Handler;
+import edu.oswego.franticphases.settings.Settings;
 
 
 
 
 public class GameScreen extends AbstractScreen  {
 	InputMultiplexer inputMux = new InputMultiplexer();
-	private WebCallback callBack;
-	private Handler handler;
+
 	public Table userData;
+	
 	public GameScreen(FranticPhases game) {
 		super(game);
-		handler = new Handler(this);
+		//handler = new Handler(this);
 	}
 	
 	@Override
@@ -57,21 +57,11 @@ public class GameScreen extends AbstractScreen  {
         //table.bottom();
         window.addActor(table);
         
-        userData= new Table(skin);
-		ScrollPane scroll = new ScrollPane(userData, skin);
 
-		table.add(scroll).expandY().padTop(20).padBottom(10);
-        table.row();
-        Button play = new TextButton("get users", skin);
-        table.add(play).width(100).pad(10).colspan(4);
-        play.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-            	callBack = new WebCallback();
-    			DataSender aSender = new DataSender();
-    			aSender.getAllUserNames(callBack, handler);
-            }
-        });
+        
+        
+        
+        
         table.row();
         table.bottom();
         Button back = new TextButton("Back", skin);

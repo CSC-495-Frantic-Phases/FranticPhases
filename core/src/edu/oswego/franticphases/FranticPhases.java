@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
+import edu.oswego.franticphases.gamelogic.Handler;
+import edu.oswego.franticphases.screens.CreateAGameScreen;
 import edu.oswego.franticphases.screens.CreateAccountScreen;
 import edu.oswego.franticphases.screens.GameScreen;
 import edu.oswego.franticphases.screens.GameSelectScreen;
@@ -35,6 +37,7 @@ public class FranticPhases extends Game implements SettingsObserver{
 	private SettingsScreen settingsScreen;
 	private HelpScreen helpScreen;
 	private GameSelectScreen gsScreen;
+	private CreateAGameScreen createGameScreen;
 	
 	private Settings settings;
 	private Stage stage;
@@ -45,6 +48,7 @@ public class FranticPhases extends Game implements SettingsObserver{
 	Texture img;
 	private int width;
 	private int height;
+	private String currentGameID;
 	
 	
 
@@ -64,6 +68,14 @@ public class FranticPhases extends Game implements SettingsObserver{
 	
 	private void loadSkin() {
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
+	}
+	
+	public void setCurrentGame(String g){
+		currentGameID = g;
+	}
+	
+	public String getCurrentGame(){
+		return currentGameID;
 	}
 	
 	public void showMainScreen() {
@@ -101,6 +113,15 @@ public class FranticPhases extends Game implements SettingsObserver{
 		screenStack.push(getScreen());
 		caScreen = new CreateAccountScreen(this);
 		setScreen(caScreen);
+	}
+	
+	public void showCreateAGameScreen(Handler handler) {
+		if (createGameScreen != null) {
+			createGameScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		createGameScreen = new CreateAGameScreen(this, handler);
+		setScreen(createGameScreen);
 	}
 	
 	public void showHelpScreen() {

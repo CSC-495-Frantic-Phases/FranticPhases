@@ -9,7 +9,6 @@ public class WebCallback {
 	private boolean isRecieved = false;
 	private boolean debug = false;
 	private boolean success;
-	private JsonValue json;
 	
 	private String message;
 	
@@ -29,9 +28,7 @@ public class WebCallback {
 		return message;
 	}
 	
-	public JsonValue getJson(){
-		return json;
-	}
+
 	
 	private void setUserID(String id){
 		Settings.setUserID(id);
@@ -56,14 +53,6 @@ public class WebCallback {
 		message = _message;
 	}
 	
-	public void setData(boolean _result, String _message, JsonValue js){
-		if(debug){
-			System.out.println("Data set in CB");
-		}
-		isRecieved = true;
-		success = _result;
-		message = _message;
-		json = js;
-	}
+
 
 }

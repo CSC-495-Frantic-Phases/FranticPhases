@@ -20,7 +20,7 @@ public class Settings {
 	
 	public Settings(){
 		thePreferences = Gdx.app.getPreferences("GameData");
-		thePreferences.clear();
+		//thePreferences.clear();
 	}
 	
 	public static String getUsername(){

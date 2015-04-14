@@ -4,24 +4,19 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import sun.awt.windows.ThemeReader;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net.HttpMethods;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.net.HttpParametersUtils;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.JsonWriter;
 
-import edu.oswego.franticphases.GameSession;
-import edu.oswego.franticphases.User;
-import edu.oswego.franticphases.gamelogic.GameHandler;
+import edu.oswego.franticphases.gamelogic.Card;
+import edu.oswego.franticphases.gamelogic.CardGame;
 import edu.oswego.franticphases.gamelogic.Hand;
-import edu.oswego.franticphases.gamelogic.Handler;
+import edu.oswego.franticphases.gamelogic.Player;
 import edu.oswego.franticphases.settings.Settings;
 
 public class DataSender {
@@ -33,21 +28,16 @@ public class DataSender {
 	
 	public void createNewAccount(String _name, String _password, final WebCallback _theCallback){
 		if(debug){
-			System.out.println("CREATE NEW ACCOUNT");
+			Gdx.app.log("DATA SENDER","CREATE NEW ACCOUNT");
 		}
 		HashMap<String, String> parameters = new HashMap<String,String>();
 		parameters.put("username", _name);
 		parameters.put("password", _password);
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		//httpPost.setUrl("http://localhost:1234/webservice/register.php");
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/register.php");
-		//httpPost.setUrl(" ");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
-		//System.out.println("username: " +_name);
 		 Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
-		        		
-
 		        	InputStream is = httpResponse.getResultAsStream();
 		        		JsonReader jr = new JsonReader();
 		        		JsonValue jsonVal = jr.parse(is);
@@ -55,7 +45,7 @@ public class DataSender {
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Create New Account Failed " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Create New Account Failed " + t.getMessage());
 		        }
 
 				@Override
@@ -68,13 +58,12 @@ public class DataSender {
 	
 	public void login(String _name, String _password, final WebCallback _theCallback){
 		if(debug){
-			System.out.println("LOGIN");
+			Gdx.app.log("DATA SENDER","LOGIN");
 		}
 		HashMap<String, String> parameters = new HashMap<String,String>();
 		parameters.put("username", _name);
 		parameters.put("password", _password);
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
-		//httpPost.setUrl("http://localhost:1234/webservice/login.php");
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/login.php");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
 		Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
@@ -82,13 +71,11 @@ public class DataSender {
 		        	InputStream is = httpResponse.getResultAsStream();
 	        		JsonReader jr = new JsonReader();
 	        		JsonValue jsonVal = jr.parse(is);
-	        		//System.out.println("Json from login: "+jsonVal.toString());
 	        		parseLoginData(jsonVal, _theCallback);
-
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in login " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in login " + t.getMessage());
 		        }
 
 				@Override
@@ -101,7 +88,7 @@ public class DataSender {
 	
 	public void getGames(String id, final WebCallback _theCallback, final Handler handler){
 		if(debug){
-			System.out.println("GETTING GAME SESSIONS");
+			Gdx.app.log("DATA SENDER", "GETTING GAME SESSIONS");
 		}
 		HashMap<String, String> parameters = new HashMap<String,String>();
 		parameters.put("userID", id);
@@ -118,7 +105,7 @@ public class DataSender {
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in get games " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in get games " + t.getMessage());
 		        }
 
 				@Override
@@ -131,7 +118,7 @@ public class DataSender {
 	
 	public void getUsers(final WebCallback _theCallback, final Handler handler){
 		if(debug){
-			System.out.println("getting users");
+			Gdx.app.log("DATA SENDER","getting users");
 		}
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/getUsers.php");
@@ -140,13 +127,12 @@ public class DataSender {
 		        	InputStream is = httpResponse.getResultAsStream();
 	        		JsonReader jr = new JsonReader();
 	        		JsonValue jsonVal = jr.parse(is);
-	        		//System.out.println("Json from get users: "+jsonVal.toString());
 	        		parseUserData(jsonVal, _theCallback, handler);
 
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in get users " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in get users " + t.getMessage());
 		        }
 
 				@Override
@@ -158,15 +144,40 @@ public class DataSender {
 	}
 	
 	
-	public void createGame(ArrayList<User> players, final WebCallback _theCallback, final Handler handler){
+	public void createGame(final CardGame game, final WebCallback _theCallback, final Handler handler){
 		if(debug){
-			System.out.println("CREATING GAME");
+			Gdx.app.log("DATA SENDER","CREATING GAME");
+		}
+		ArrayList<Hand> hands = game.dealHands();
+		ArrayList<Player> players = game.getPlayers();
+		
+		if (hands.size() != players.size()) {
+			Gdx.app.log("DATA SENDER",
+					"number of hands != number of players");
 		}
 		HashMap<String, String> parameters = new HashMap<String,String>();
-		parameters.put("player1", players.get(0).getUserID());
-		parameters.put("player2", players.get(1).getUserID());
-		parameters.put("player3", players.get(2).getUserID());
-		parameters.put("player4", players.get(3).getUserID());
+		parameters.put("numCardsUsed", game.getIntCardsLeft());
+		parameters.put("cards", game.getCardsInDeckAsString());
+		parameters.put("numPlayers", String.valueOf(game.getNumPlayers()));
+		parameters.put("faceUp", game.getFaceUpCard());
+
+		for (int j = 0; j < game.getNumPlayers(); j++) {
+			int turn;
+			if(j == 0){
+				turn = 1;
+			}else{
+				turn = 0;
+			}
+			parameters.put("userID"+String.valueOf(j+1), players.get(j).getID());
+			parameters.put("number"+String.valueOf(j+1), String.valueOf(j + 1));
+			parameters.put("turn"+String.valueOf(j+1), String.valueOf(turn));
+			ArrayList<Card> cards = hands.get(j).getCards();
+			for (int i = 0; i < cards.size(); i++) {
+				Card c = cards.get(i);
+				parameters.put("c"+String.valueOf(j+1) + String.valueOf(i+1),
+						c.getSuitAsString() + c.getValueAsString());
+			}
+		}
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/createGame.php");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
@@ -175,12 +186,12 @@ public class DataSender {
 		        	InputStream is = httpResponse.getResultAsStream();
 	        		JsonReader jr = new JsonReader();
 	        		JsonValue jsonVal = jr.parse(is);
-	        		parseCreateGameData(jsonVal, _theCallback, handler);
-
+	        		parseCreateGameData(game, jsonVal, _theCallback, handler);
+	        		
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in create game " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in create game " + t.getMessage());
 		        }
 
 				@Override
@@ -191,10 +202,27 @@ public class DataSender {
 		 });
 	}
 	
+	
+	private void parseCreateGameData(CardGame game, JsonValue theResult, WebCallback _theCallback, Handler handler){
+		Gdx.app.log("DATA SENDER",theResult.toString());
+		boolean result = theResult.getBoolean("success");
+		String message = "";
+		
+		if (result){
+			message = theResult.getString("message");
+			String gameID = theResult.getString("gameID");
+			game.setGameID(gameID);
+			handler.setNewGame(gameID);
+		}
+		
+		_theCallback.setData(result, message);
+		
+	}
+	
 
 	public void loadGameData(String gameID, final WebCallback _theCallback, final GameHandler handler){
 		if(debug){
-			System.out.println("GETTING GAME");
+			Gdx.app.log("DATA SENDER","GETTING GAME"+gameID);
 		}
 		HashMap<String, String> parameters = new HashMap<String,String>();
 		parameters.put("gameID", gameID);
@@ -212,7 +240,7 @@ public class DataSender {
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in load game data " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in load game data " + t.getMessage());
 		        }
 
 				@Override
@@ -222,11 +250,11 @@ public class DataSender {
 				}
 		 });
 	}
-	public void checkIfTurn(String gameID, String playerNum, final WebCallback _theCallback, final GameHandler handler){
+	public void checkIfTurn(CardGame game, final WebCallback _theCallback, final GameHandler handler){
 
 		HashMap<String, String> parameters = new HashMap<String,String>();
-		parameters.put("gameID", gameID);
-		parameters.put("playerNum", playerNum);
+		parameters.put("gameID", game.getGameID());
+		parameters.put("playerNum", game.getUserPlayerNum());
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/checkTurn.php");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
@@ -240,7 +268,7 @@ public class DataSender {
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in check if turn" + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in check if turn" + t.getMessage());
 		        }
 
 				@Override
@@ -251,13 +279,13 @@ public class DataSender {
 		 });
 	}
 	
-	public void toggleNextPlayer(String gameID, String playerNum, final WebCallback _theCallback){
+	public void toggleNextPlayer(CardGame game, final WebCallback _theCallback){
 		if(debug){
-			System.out.println("TOGGLE NEXT PLAYER");
+			Gdx.app.log("DATA SENDER","TOGGLE NEXT PLAYER");
 		}
 		HashMap<String, String> parameters = new HashMap<String,String>();
-		parameters.put("gameID", gameID);
-		parameters.put("playerNum", playerNum);
+		parameters.put("gameID", game.getGameID());
+		parameters.put("playerNum", game.getUserPlayerNum());
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/toggleNext.php");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
@@ -271,7 +299,7 @@ public class DataSender {
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in toggle next player " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in toggle next player " + t.getMessage());
 		        }
 
 				@Override
@@ -284,7 +312,7 @@ public class DataSender {
 	
 	public void cardDiscarded(String gameID, String card, final WebCallback _theCallback, final GameHandler handler){
 		if(debug){
-			System.out.println("DISCARD");
+			Gdx.app.log("DATA SENDER","DISCARD");
 		}
 		HashMap<String, String> parameters = new HashMap<String,String>();
 		parameters.put("gameID", gameID);
@@ -303,7 +331,7 @@ public class DataSender {
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in discard card " + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in discard card " + t.getMessage());
 		        }
 
 				@Override
@@ -330,7 +358,7 @@ public class DataSender {
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in update faceup card" + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in update faceup card" + t.getMessage());
 		        }
 
 				@Override
@@ -345,16 +373,6 @@ public class DataSender {
 		
 		HashMap<String, String> parameters = new HashMap<String,String>();
 		parameters.put("handID", hand.getHandID());
-		parameters.put("card01", hand.getCard1());
-		parameters.put("card02", hand.getCard2());
-		parameters.put("card03", hand.getCard3());
-		parameters.put("card04", hand.getCard4());
-		parameters.put("card05", hand.getCard5());
-		parameters.put("card06", hand.getCard6());
-		parameters.put("card07", hand.getCard7());
-		parameters.put("card08", hand.getCard8());
-		parameters.put("card09", hand.getCard9());
-		parameters.put("card10", hand.getCard10());
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/updateHand.php");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
@@ -364,11 +382,10 @@ public class DataSender {
 	        		JsonReader jr = new JsonReader();
 	        		JsonValue jsonVal = jr.parse(is);
 	        		parseAckData(jsonVal, _theCallback);
-
 		        }
 		 
 		        public void failed(Throwable t) {
-		        		System.out.println("Failed in update Hand" + t.getMessage());
+		        	Gdx.app.log("DATA SENDER","Failed in update Hand" + t.getMessage());
 		        }
 
 				@Override
@@ -379,7 +396,7 @@ public class DataSender {
 		 });
 	}
 	private void parseAckData(JsonValue theResult, WebCallback _theCallback){
-		System.out.println(theResult.toString());
+		Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		
@@ -391,7 +408,7 @@ public class DataSender {
 	}
 
 	private void parseFaceUpData(JsonValue theResult, WebCallback _theCallback, GameHandler handler){
-		System.out.println(theResult.toString());
+		Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		if (result){
@@ -404,7 +421,7 @@ public class DataSender {
 	}
 	
 	private void parseGameData(JsonValue theResult, WebCallback _theCallback, GameHandler handler){
-		System.out.println(theResult.toString());
+		Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		if (result){
@@ -414,7 +431,7 @@ public class DataSender {
 		_theCallback.setData(result, message);
 	}
 	private void parseTurnData(JsonValue theResult, WebCallback _theCallback, GameHandler handler){
-		System.out.println(theResult.toString());
+		Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		if (result){
@@ -436,7 +453,7 @@ public class DataSender {
 	
 	
 	private void parseLoginData(JsonValue theResult, WebCallback _theCallback){
-		//System.out.println(theResult.toString());
+		//Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		String id = "";
@@ -449,22 +466,11 @@ public class DataSender {
 		_theCallback.setData(result, message, id);
 	}
 	
-	private void parseCreateGameData(JsonValue theResult, WebCallback _theCallback, Handler handler){
-		//System.out.println(theResult.toString());
-		boolean result = theResult.getBoolean("success");
-		String message = "";
-		
-		if (result){
-			message = theResult.getString("message");
-			String gameID = theResult.getString("gameID");
-			handler.setNewGame(gameID);
-		}
-		
-		_theCallback.setData(result, message);
-		
-	}
+
+	
+	
 	private void parseGameSessionData(JsonValue theResult, WebCallback _theCallback, Handler handler){
-		//System.out.println(theResult.toString());
+		//Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		
@@ -482,7 +488,7 @@ public class DataSender {
 	}
 	
 	private void parseUserData(JsonValue theResult, WebCallback _theCallback, Handler handler){
-		//System.out.println(theResult.toString());
+		//Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "no";
 		

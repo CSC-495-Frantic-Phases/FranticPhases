@@ -18,10 +18,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 
 import edu.oswego.franticphases.FranticPhases;
-import edu.oswego.franticphases.GameSession;
 import edu.oswego.franticphases.datasending.DataSender;
+import edu.oswego.franticphases.datasending.GameSession;
+import edu.oswego.franticphases.datasending.Handler;
 import edu.oswego.franticphases.datasending.WebCallback;
-import edu.oswego.franticphases.gamelogic.Handler;
+import edu.oswego.franticphases.gamelogic.CardGame;
 import edu.oswego.franticphases.settings.Settings;
 import edu.oswego.franticphases.widgets.Hud;
 
@@ -72,11 +73,6 @@ public class GameSelectScreen extends AbstractScreen  {
 		gameData.add("All of your current games!!!").padRight(25).padLeft(25);
 		table.add(scroll).expandY().padTop(20).padBottom(10);
 		
-
-        
-		
-		
-		
 		table.row();
 		Button newGame = new TextButton("New Game", skin);
 		table.add(newGame).bottom();
@@ -92,7 +88,7 @@ public class GameSelectScreen extends AbstractScreen  {
 		playGame.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setCurrentGame(selectedGame.getGameID());
+				game.setGame(new CardGame(selectedGame.getGameID()));
 				game.showGameScreen();
 			}
 		});
@@ -177,9 +173,6 @@ public class GameSelectScreen extends AbstractScreen  {
 
 	
 	private void getCurrentGames(){
-		if(debug){
-			System.out.println("GETTING CURRENT GAMES");
-		}
 		callBack = new WebCallback();
 		DataSender aSender = new DataSender();
 		aSender.getGames(Settings.getUserID(), callBack, handler);

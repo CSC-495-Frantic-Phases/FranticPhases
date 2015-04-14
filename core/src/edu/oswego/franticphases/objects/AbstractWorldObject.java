@@ -1,9 +1,7 @@
-package edu.oswego.franticphases.gamelogic;
+package edu.oswego.franticphases.objects;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
-
-
 
 abstract class AbstractWorldObject implements WorldObject {
 	protected final Body body;

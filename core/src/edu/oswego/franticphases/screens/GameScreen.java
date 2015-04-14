@@ -4,53 +4,87 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 
 import edu.oswego.franticphases.FranticPhases;
+import edu.oswego.franticphases.datasending.GameHandler;
 import edu.oswego.franticphases.dialogs.PauseDialog;
-import edu.oswego.franticphases.gamelogic.GameHandler;
+import edu.oswego.franticphases.gamelogic.DebugPhaseRenderer;
+import edu.oswego.franticphases.gamelogic.DefaultPhaseRenderer;
+import edu.oswego.franticphases.gamelogic.Phase;
+import edu.oswego.franticphases.gamelogic.PhaseRenderer;
 import edu.oswego.franticphases.gamelogic.Turn;
-import edu.oswego.franticphases.widgets.Hud;
-
-
+import edu.oswego.franticphases.gamelogic.WorldPopulator;
 
 public class GameScreen extends AbstractScreen  {
 	InputMultiplexer inputMux = new InputMultiplexer();
-	private final Hud hud;
 	private GameHandler handler;
 	private State currentState;
 	private Dialog pauseDialog;
-	private Button faceupCardButton;
-	private Button deckButton;
-	private Button refresh;
 	private Turn turn;
+	private AssetManager assetManager;//will be used for loading sounds/music
+	private PhaseRenderer renderer;
+	private final WorldPopulator worldPopulator;
+	private Phase phase;
+	
 	
 	public GameScreen(FranticPhases game) {
 		super(game);
-		hud = new Hud(this, skin);
-
-		handler = new GameHandler(game.getCurrentGame(), hud);
+		//hud = new Hud(this, skin);
+		assetManager = game.getAssetManager();
+		handler = new GameHandler(this, game.getCurrentGame());
+		worldPopulator = new WorldPopulator(game.getAssetManager());
 		this.loadGameData();
 	}
 	
 	private void loadGameData(){
-		changeState(State.WAITING);
 		handler.loadGame();
+		changeState(State.WAITING);
+		Gdx.app.log("GameScreen", "Loading Phase");
+		if (phase != null) {
+			phase.dispose();
+			phase = null;
+		}
+		if (renderer != null) {
+			renderer.dispose();
+			renderer = null;
+		}
+		
+		Gdx.app.log("GameScreen", "Cleaned up previous phase");
+		int num = 0;//gotta load current phase from cardGame
+		phase = new Phase(num,
+				game.getPhases().get(num),
+				worldPopulator, game.getAssetManager());
+		Gdx.app.log("GameScreen", "Phase loaded");
+
+		renderer = new DefaultPhaseRenderer(phase,
+				game.getWidth(), game.getHeight(),
+				game.getSpriteBatch(),
+				game.getAssetManager());
+	
+		renderer = new DebugPhaseRenderer(renderer);
+		
+		Gdx.app.log("GameScreen", "Renderer created");
+//		audio = new AudioManager(
+//				level,
+//				game.getSettings().isMusicOn(),
+//				game.getSettings().isSoundEffectOn(),
+//				game.getAssetManager());
+//		game.getSettings().addObserver(audio);
+//		Gdx.app.log("GameScreen", "Audio manager created");
+		//hud.setLevel(num + 1);
+
+		Gdx.app.log("GameScreen", "Phase starting...");
 	}
+	
 	private void changeState(State state) {
 		System.out.println("GAME STATE CHANGED: "+ state.toString());
 		currentState = state;
 	}
 	@Override
 	protected void preStageRenderHook(float delta){
+		renderer.render(delta, game.getSpriteBatch(), game.getFont());
 		currentState.render(this, delta);
 	}
 	
@@ -99,49 +133,10 @@ public class GameScreen extends AbstractScreen  {
 				return super.keyDown(keycode);
 			}
 		});
-		Window window = new Window("\nGame", skin);
-		window.setHeight(100);
-		window.setWidth(stage.getWidth());
-		window.setPosition(0, stage.getWidth()/2);
-        stage.addActor(window);
-        Table table = new Table();
-        table.setFillParent(true);
-        //table.bottom();
-        window.addActor(table);
-        
-        faceupCardButton = new TextButton("Faceup Card", skin);
-        table.add(faceupCardButton).pad(25);
-        faceupCardButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-            	faceUpCard();
-            }
-        });
-        
-        
-        deckButton = new TextButton("DECK", skin);
-        table.add(deckButton).pad(25);
-        deckButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-            	deck();
-            }
-        });
-        
-        refresh = new TextButton("Refresh", skin);
-        table.add(refresh).pad(25);
-        refresh.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-            	refresh();
-            }
-        });
-        
-		hud.setPosition(0, 0);
-		hud.setHeight(150);
-		hud.setWidth(stage.getWidth());
-		stage.addActor(hud);
 		
+
+        
+ 
 		currentState.show(this);
 	}
 	
@@ -149,6 +144,8 @@ public class GameScreen extends AbstractScreen  {
 	@Override
 	public void dispose() {
 		super.dispose();
+		//world.dispose();
+		renderer.dispose();
 
 	}
 	
@@ -180,7 +177,7 @@ public class GameScreen extends AbstractScreen  {
 			}
 			@Override
 			public void refresh(GameScreen s){
-				s.faceupCardButton.setName(s.handler.getFaceUpCard());
+				
 				s.handler.update();
 			}
 			@Override

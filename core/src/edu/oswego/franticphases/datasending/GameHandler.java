@@ -1,25 +1,19 @@
-package edu.oswego.franticphases.gamelogic;
+package edu.oswego.franticphases.datasending;
 
 import com.badlogic.gdx.utils.JsonValue;
 
-import edu.oswego.franticphases.GameSession;
-import edu.oswego.franticphases.datasending.DataSender;
-import edu.oswego.franticphases.datasending.WebCallback;
+import edu.oswego.franticphases.gamelogic.CardGame;
+import edu.oswego.franticphases.screens.GameScreen;
 import edu.oswego.franticphases.widgets.Hud;
 
 public class GameHandler {
 	private WebCallback callBack;
-	private Hand hand;
-	private Game game;
-	private Hud hud;
-	private boolean turn = false;
-	private String gameID;
-	private boolean discardUpdated = false;
-	private boolean handUpdated = false;
+	private CardGame game;
+	GameScreen screen;
 
-	public GameHandler(String game, Hud h) {
-		gameID = game;
-		hud = h;
+	public GameHandler(GameScreen s, CardGame g) {
+		game = g;
+		screen = s;
 	}
 
 	public void loadGame() {
@@ -33,7 +27,7 @@ public class GameHandler {
 	}
 
 	public boolean getIsTurn() {
-		return turn;
+		return game.isTurn();
 	}
 
 	public String getFaceUpCard() {
@@ -44,7 +38,7 @@ public class GameHandler {
 	}
 
 	public void faceUpCardSelected() {
-		hud.setCard11(game.getFaceUpCard());
+		//hud.setCard11(game.getFaceUpCard());
 	}
 
 	public void endTurn() {
@@ -53,15 +47,14 @@ public class GameHandler {
 		// then toggle turn
 		// then update hand
 		// updates phases down
-		updateDiscardedCard(hud.getDiscardedCard());
+		//updateDiscardedCard(hud.getDiscardedCard());
 
 	}
 
 	// methods for the data sender
 	public void setGame(JsonValue json) {
-		game = new Game(json);
-		hand = new Hand(json.get("hand"));
-		hud.setHand(hand);
+		game = new CardGame(json);
+		//screen.setHand(game.getHandCards());
 		this.checkIsTurn();
 	}
 
@@ -72,7 +65,7 @@ public class GameHandler {
 
 	public void setTurn(boolean t) {
 		// called from checkTurn()
-		turn = t;
+		game.setTurn(t);
 	}
 
 	public void toggleNextPlayer() {
@@ -80,7 +73,7 @@ public class GameHandler {
 		if (callBack.getRecieved()) {
 			callBack = new WebCallback();
 			DataSender aSender = new DataSender();
-			aSender.toggleNextPlayer(gameID, game.getUserPlayerNum(), callBack);
+			aSender.toggleNextPlayer(game, callBack);
 		}
 	}
 	public void updateHand() {
@@ -88,7 +81,7 @@ public class GameHandler {
 		if (callBack.getRecieved()) {
 			callBack = new WebCallback();
 			DataSender aSender = new DataSender();
-			aSender.updateHand(hand, callBack);
+			aSender.updateHand(game.getHand(), callBack);
 		}
 	}
 
@@ -99,14 +92,14 @@ public class GameHandler {
 
 		callBack = new WebCallback();
 		DataSender aSender = new DataSender();
-		aSender.loadGameData(gameID, callBack, this);
+		aSender.loadGameData(game.getGameID(), callBack, this);
 	}
 
 	private void checkIsTurn() {
 		if (callBack.getRecieved()) {
 			callBack = new WebCallback();
 			DataSender aSender = new DataSender();
-			aSender.checkIfTurn(gameID, game.getUserPlayerNum(), callBack, this);
+			aSender.checkIfTurn(game, callBack, this);
 		}
 	}
 
@@ -115,7 +108,7 @@ public class GameHandler {
 			callBack = new WebCallback();
 			DataSender aSender = new DataSender();
 			// next player would need face down card updated
-			aSender.cardDiscarded(gameID, card, callBack, this);
+			aSender.cardDiscarded(game.getGameID(), card, callBack, this);
 			game.setFaceUpCard(card);
 		}
 	}
@@ -125,7 +118,7 @@ public class GameHandler {
 			callBack = new WebCallback();
 			DataSender aSender = new DataSender();
 			// next player would need face down card updated
-			aSender.updateFaceUpCard(gameID, callBack, this);
+			aSender.updateFaceUpCard(game.getGameID(), callBack, this);
 		}
 	}
 

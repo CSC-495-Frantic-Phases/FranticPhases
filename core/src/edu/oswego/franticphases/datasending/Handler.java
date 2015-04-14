@@ -1,16 +1,14 @@
-package edu.oswego.franticphases.gamelogic;
+package edu.oswego.franticphases.datasending;
 
 import java.util.ArrayList;
 
 import com.badlogic.gdx.utils.JsonValue;
-
-import edu.oswego.franticphases.GameSession;
-import edu.oswego.franticphases.User;
+import edu.oswego.franticphases.gamelogic.Player;
 import edu.oswego.franticphases.screens.GameScreen;
 import edu.oswego.franticphases.screens.GameSelectScreen;
 
 public class Handler {
-	private ArrayList<User> users;
+	private ArrayList<Player> users;
 	private ArrayList<GameSession> games;
 	private String newGameID;
 	private boolean usersUpdated = false;
@@ -18,7 +16,7 @@ public class Handler {
 	private boolean newGameUpdated = false;
 
 	public Handler(){
-		users = new ArrayList<User>();
+		users = new ArrayList<Player>();
 		games = new ArrayList<GameSession>();
 		
 	}
@@ -75,13 +73,13 @@ public class Handler {
 			JsonValue tmp = json.get(i);
 			String name = tmp.getString("username");
 			String id = tmp.getString("userID");
-			User newUser = new User(name, id);
+			Player newUser = new Player(name, id);
 			users.add(newUser);
 		}
 		usersUpdated = true;
 	}
 	
-	public ArrayList<User> getUsers(){
+	public ArrayList<Player> getUsers(){
 		usersUpdated = false;
 		return users;
 	}

@@ -1,4 +1,4 @@
-package edu.oswego.franticphases.gamelogic;
+package edu.oswego.franticphases.graphics;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;

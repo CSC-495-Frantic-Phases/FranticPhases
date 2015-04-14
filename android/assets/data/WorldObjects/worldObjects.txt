@@ -1,0 +1,18 @@
+worldObjects.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+card
+  rotate: false
+  xy: 2, 2
+  size: 72, 96
+  orig: 72, 96
+  offset: 0, 0
+  index: -1
+defaultcard
+  rotate: false
+  xy: 76, 2
+  size: 72, 96
+  orig: 72, 96
+  offset: 0, 0
+  index: -1

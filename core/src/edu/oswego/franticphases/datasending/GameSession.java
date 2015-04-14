@@ -1,4 +1,4 @@
-package edu.oswego.franticphases;
+package edu.oswego.franticphases.datasending;
 
 
 public class GameSession {

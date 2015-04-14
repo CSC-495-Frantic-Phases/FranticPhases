@@ -16,10 +16,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import edu.oswego.franticphases.FranticPhases;
-import edu.oswego.franticphases.User;
 import edu.oswego.franticphases.datasending.DataSender;
+import edu.oswego.franticphases.datasending.Handler;
 import edu.oswego.franticphases.datasending.WebCallback;
-import edu.oswego.franticphases.gamelogic.Handler;
+import edu.oswego.franticphases.gamelogic.CardGame;
+import edu.oswego.franticphases.gamelogic.Hand;
+import edu.oswego.franticphases.gamelogic.Player;
 import edu.oswego.franticphases.settings.Settings;
 
 public class CreateAGameScreen extends AbstractScreen{
@@ -28,9 +30,9 @@ public class CreateAGameScreen extends AbstractScreen{
 	private Handler handler;
 	boolean debug = true;
 	boolean hasUsers = false;
-	ArrayList<User> users;
+	CardGame newGame;
 	Table userData;
-	ArrayList<User> selectedUsers;
+	ArrayList<Player> users;
 	Button go;
 	
 	
@@ -39,10 +41,11 @@ public class CreateAGameScreen extends AbstractScreen{
 		super(game);
 		handler = hand;
 		this.getAllUsers();
-		users = new ArrayList<User>();
-		selectedUsers = new ArrayList<User>();
-		User me = new User(Settings.getUsername(), Settings.getUserID());
-		selectedUsers.add(me);
+		newGame = new CardGame("maybe messed up");
+		//selectedUsers = new ArrayList<Player>();
+		Player me = new Player(Settings.getUsername(), Settings.getUserID());
+		//selectedUsers.add(me);
+		newGame.addPlayer(me);
 	}
 
 	@Override
@@ -93,13 +96,17 @@ public class CreateAGameScreen extends AbstractScreen{
 		go.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				
+				newGame.createDeck();
+				
 				callBack = new WebCallback();
 				DataSender aSender = new DataSender();
-				aSender.createGame(selectedUsers,callBack, handler);
-			
+				aSender.createGame(newGame, callBack, handler);		
+
+        		
 				System.out.println("LOADING");
 				
-			}
+		}
 		});
 		
 		
@@ -113,7 +120,7 @@ public class CreateAGameScreen extends AbstractScreen{
 		userData.add("Select friends to play with!").padRight(50).padLeft(50);
 		int index = 1;
 		for(int i = 0; i < users.size();i++){
-			if(!users.get(i).getUserID().equals(Settings.getUserID())){
+			if(!users.get(i).getID().equals(Settings.getUserID())){
 			userData.row();
 			CheckBox box = new CheckBox("" ,skin);
 			final int tmp = i;
@@ -121,10 +128,10 @@ public class CreateAGameScreen extends AbstractScreen{
 
 				@Override
 				public void changed(ChangeEvent event, Actor actor) {
-					if(selectedUsers.contains(users.get(tmp))){
-						selectedUsers.remove(users.get(tmp));
+					if(newGame.getPlayers().contains(users.get(tmp))){
+						newGame.removePlayer(users.get(tmp));
 					}else{
-					selectedUsers.add(users.get(tmp));
+						newGame.addPlayer(users.get(tmp));
 					}
 					
 				}
@@ -136,30 +143,22 @@ public class CreateAGameScreen extends AbstractScreen{
 			}
 		}
 		}
-		if(selectedUsers.size()==4){
+		if(newGame.getNumPlayers()==4){
 			go.setVisible(true);
 		}else{
 			go.setVisible(false);
 		}
 		if(handler.isNewGameUpdated()){
-			game.setCurrentGame(handler.getNewGameID());
+			game.setGame(new CardGame(handler.getNewGameID()));
 			game.showGameScreen();
 		}
 	}
 
 	private void getAllUsers(){
-		if(debug){
-			System.out.println("GETTING USERS");
-		}
 		callBack = new WebCallback();
 		DataSender aSender = new DataSender();
 		aSender.getUsers( callBack, handler);
 		hasUsers = callBack.getResult();
-	}
-
-	
-	
-	
-	
+	}	
 	
 }

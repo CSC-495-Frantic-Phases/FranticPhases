@@ -1,4 +1,4 @@
-package edu.oswego.franticphases.gamelogic;
+package edu.oswego.franticphases.objects;
 
 import com.badlogic.gdx.physics.box2d.Body;
 

@@ -8,18 +8,22 @@ public class Player {
 	String score;
 	String phase;
 	String playerNum;
-	boolean isUser;
+	String id;
+	
 	
 	public Player(String name, String s, String p, String num){
 		userName = name;
 		score = s;
 		phase = p;
 		playerNum = num;
-		if(Settings.getUsername().equals(userName)){
-			isUser = true;
-		}else{
-			isUser = false;
-		}
+	}
+	public Player(String name, String i){
+		userName = name;
+		id = i;
+	}
+	
+	public String getID(){
+		return id;
 	}
 	
 	public String getUserName(){

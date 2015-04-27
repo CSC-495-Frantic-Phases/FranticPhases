@@ -7,7 +7,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Disposable;
 
 import edu.oswego.franticphases.gamelogic.UnitScale;
@@ -50,8 +54,9 @@ public class HandCardObject extends AbstractWorldObject implements Disposable, A
 	public void draw(float delta, SpriteBatch batch) {
 		if (visible && graphic !=null) {
 			
-			graphic.setPosition(scale.metersToPixels(body.getPosition().x),
-					scale.metersToPixels(body.getPosition().y));
+			//graphic.setPosition(scale.metersToPixels(body.getPosition().x),
+			//		scale.metersToPixels(body.getPosition().y));
+			graphic.setPosition(getMapX(), getMapY());
 			graphic.draw(delta, batch);
 		}
 	}

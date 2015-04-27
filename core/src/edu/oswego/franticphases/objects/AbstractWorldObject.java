@@ -2,8 +2,9 @@ package edu.oswego.franticphases.objects;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
-abstract class AbstractWorldObject implements WorldObject {
+abstract class AbstractWorldObject extends Actor implements WorldObject {
 	protected final Body body;
 
 	AbstractWorldObject(Body body) {

@@ -1,5 +1,7 @@
 package edu.oswego.franticphases.screens;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
@@ -10,12 +12,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import edu.oswego.franticphases.FranticPhases;
 import edu.oswego.franticphases.datasending.GameHandler;
 import edu.oswego.franticphases.dialogs.PauseDialog;
+import edu.oswego.franticphases.gamelogic.CardController;
 import edu.oswego.franticphases.gamelogic.DebugPhaseRenderer;
 import edu.oswego.franticphases.gamelogic.DefaultPhaseRenderer;
 import edu.oswego.franticphases.gamelogic.Phase;
 import edu.oswego.franticphases.gamelogic.PhaseRenderer;
 import edu.oswego.franticphases.gamelogic.Turn;
 import edu.oswego.franticphases.gamelogic.WorldPopulator;
+import edu.oswego.franticphases.objects.HandCardObject;
 
 public class GameScreen extends AbstractScreen  {
 	InputMultiplexer inputMux = new InputMultiplexer();
@@ -57,6 +61,12 @@ public class GameScreen extends AbstractScreen  {
 				game.getPhases().get(num),
 				worldPopulator, game.getAssetManager());
 		Gdx.app.log("GameScreen", "Phase loaded");
+		
+		ArrayList<HandCardObject> hand = phase.getHand();
+		
+		for(HandCardObject c:hand){
+			stage.addActor(c);
+		}
 
 		renderer = new DefaultPhaseRenderer(phase,
 				game.getWidth(), game.getHeight(),
@@ -133,10 +143,8 @@ public class GameScreen extends AbstractScreen  {
 				return super.keyDown(keycode);
 			}
 		});
-		
-
-        
- 
+		CardController controller = new CardController();
+		stage.addListener(controller);
 		currentState.show(this);
 	}
 	

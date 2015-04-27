@@ -44,7 +44,7 @@ public class Phase implements Disposable, Audible {
 	private final Collection<MapRenderable> renderableObjects;
 	private final Collection<WorldUpdateable> updateableObjects;
 	private final Collection<Audible> audibleObjects;
-	ArrayList<HandCardObject> hand;
+	private ArrayList<HandCardObject> hand;
 
 	public Phase(int phase, String filename, 
 			WorldPopulator populator, AssetManager assetManager) {
@@ -67,7 +67,7 @@ public class Phase implements Disposable, Audible {
 		audibleObjects.add(this);
 
 		hand = populator.populateWorldFromMap(this, map, world, scale);
-
+		
 //		playSound = true;
 //		String soundFile = "data/soundfx/failure-2.mp3";
 //		if (!assetManager.isLoaded(soundFile)) {
@@ -82,6 +82,10 @@ public class Phase implements Disposable, Audible {
 
 	public TiledMap getMap() {
 		return map;
+	}
+	
+	public ArrayList<HandCardObject> getHand(){
+		return hand;
 	}
 
 	public World getWorld() {
@@ -140,10 +144,6 @@ public class Phase implements Disposable, Audible {
 
 	public boolean hasFinished() {
 		return currentState == State.FINISHED;
-	}
-
-	private void updateScore() {
-		
 	}
 
 	private TiledMap loadMap(String file) {
@@ -220,6 +220,7 @@ public class Phase implements Disposable, Audible {
     			for (WorldUpdateable w : l.updateableObjects) {
     				w.update(delta);
     			}
+    			
     			l.world.step(1 / 45f, 10, 8);
     		}
         },

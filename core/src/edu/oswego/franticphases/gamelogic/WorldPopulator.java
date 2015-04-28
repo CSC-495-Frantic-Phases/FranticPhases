@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -28,16 +29,20 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
+import edu.oswego.franticphases.graphics.GraphicComponent;
+import edu.oswego.franticphases.graphics.SpriteGraphic;
+import edu.oswego.franticphases.objects.DeckObject;
+import edu.oswego.franticphases.objects.FaceUpCard;
 import edu.oswego.franticphases.objects.HandCardObject;
 
 
 public class WorldPopulator implements Disposable{
 	private final BodyDefBuilder bodyDef = new BodyDefBuilder();
 	private final FixtureDefBuilder fixtureDef = new FixtureDefBuilder();
-	private final String atlasFile = "data/WorldObjects/worldObjects.txt";
+	private final String atlasFile = "data/WorldObjects/cards.txt";
 	private final TextureAtlas atlas;
 	private final AssetManager assetManager;
-	
+	private FaceUpCard faceupCard;
 	public WorldPopulator(AssetManager assetManager) {
 		this.assetManager = assetManager;
 		assetManager.load(atlasFile, TextureAtlas.class);
@@ -53,18 +58,25 @@ public class WorldPopulator implements Disposable{
 				if (obj.getName().equals("card")) {
 					HandCardObject card = createCard(obj, world, scale);
 					level.addWorldObject(card);
-					card.setGraphic("defaultcard");
 					hand.add(card);
 				}else if(obj.getName().equals("faceup")) {
-					
+					faceupCard = createFaceup(obj, world, scale);
+					level.addWorldObject(faceupCard );
+					faceupCard.setGraphic("back");
 					
 				}else if(obj.getName().equals("deck")) {
-					
+					DeckObject deck = createDeck(obj, world,scale);
+					level.addWorldObject(deck);
+				
 					
 				}
 			}
 		}
 		return hand;
+	}
+	
+	public FaceUpCard getfCard(){
+		return faceupCard;
 	}
 	
 	public HandCardObject createCard(MapObject obj, World world, UnitScale scale) {
@@ -89,6 +101,62 @@ public class WorldPopulator implements Disposable{
 		Vector2 d = getDimensions(obj);
 
 		return new HandCardObject(body, scale, assetManager, d.x, d.y);
+		//return new HandCardObject(body, scale, assetManager, width, height);
+	}
+	
+	public FaceUpCard createFaceup(MapObject obj, World world, UnitScale scale) {
+		if (!(obj instanceof RectangleMapObject)) {
+			throw new IllegalArgumentException(obj.getName()
+					+ " Unsupported MapObject: "
+					+ obj.getClass().getName());
+		}
+
+		Body body = world.createBody(bodyDef
+				.reset()
+				.type(HandCardObject.BODY_TYPE)
+				.build());
+		Shape shape = createShape(obj, scale, body);
+		body.createFixture(fixtureDef.reset().shape(shape)
+				.friction(getFloatProperty(obj, "friction", HandCardObject.FRICTION))
+				.density(getFloatProperty(obj, "density", HandCardObject.DENSITY))
+				.restitution(getFloatProperty(obj, "restitution", HandCardObject.RESTITUTION))
+				.build());
+		// dispose after creating fixture
+		shape.dispose();
+		Vector2 d = getDimensions(obj);
+
+		return new FaceUpCard(body, scale, assetManager, d.x, d.y);
+		//return new HandCardObject(body, scale, assetManager, width, height);
+	}
+	
+	public DeckObject createDeck(MapObject obj, World world, UnitScale scale) {
+		if (!(obj instanceof RectangleMapObject)) {
+			throw new IllegalArgumentException(obj.getName()
+					+ " Unsupported MapObject: "
+					+ obj.getClass().getName());
+		}
+
+		Body body = world.createBody(bodyDef
+				.reset()
+				.type(HandCardObject.BODY_TYPE)
+				.build());
+		Shape shape = createShape(obj, scale, body);
+		body.createFixture(fixtureDef.reset().shape(shape)
+				.friction(getFloatProperty(obj, "friction", HandCardObject.FRICTION))
+				.density(getFloatProperty(obj, "density", HandCardObject.DENSITY))
+				.restitution(getFloatProperty(obj, "restitution", HandCardObject.RESTITUTION))
+				.build());
+		// dispose after creating fixture
+		shape.dispose();
+		Vector2 d = getDimensions(obj);
+
+		Sprite sprite = atlas.createSprite("back");
+		sprite.setScale(0.35f);
+		//Gdx.app.log("HandCardObject", "Loaded card: " + cardID);
+		
+		GraphicComponent graphic = new SpriteGraphic(sprite);
+		
+		return new DeckObject(body,graphic, scale, assetManager, d.x, d.y);
 		//return new HandCardObject(body, scale, assetManager, width, height);
 	}
 	

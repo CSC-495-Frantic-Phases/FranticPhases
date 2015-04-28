@@ -1,7 +1,11 @@
 package edu.oswego.franticphases.datasending;
 
+import java.util.ArrayList;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.JsonValue;
 
+import edu.oswego.franticphases.gamelogic.Card;
 import edu.oswego.franticphases.gamelogic.CardGame;
 import edu.oswego.franticphases.screens.GameScreen;
 import edu.oswego.franticphases.widgets.Hud;
@@ -9,21 +13,36 @@ import edu.oswego.franticphases.widgets.Hud;
 public class GameHandler {
 	private WebCallback callBack;
 	private CardGame game;
-	GameScreen screen;
+	private boolean loaded;
+	private String gameID;
 
-	public GameHandler(GameScreen s, CardGame g) {
-		game = g;
-		screen = s;
+	public GameHandler(String g) {
+		gameID = g;
+		loaded = false;
 	}
 
 	public void loadGame() {
 		this.loadGameData();
+		Gdx.app.log("GameHandler", "Load Game done");
 	}
+	
 
-	// public methods for the Game Screen to call
+	// public methods for the Game/Load Screen to call
 	public void update() {
 		this.checkIsTurn();
 		this.updateFaceUpCard();
+	}
+	
+	public boolean isGameLoaded(){
+		return loaded;
+	}
+	
+	public String getPhaseNumber(){
+		return game.getPlayerData(game.getUserPlayerNum()).getPhase();
+	}
+	
+	public ArrayList<String> getCards(){
+		return game.getHandCardsStrings();
 	}
 
 	public boolean getIsTurn() {
@@ -51,11 +70,16 @@ public class GameHandler {
 
 	}
 
+	
+	
 	// methods for the data sender
 	public void setGame(JsonValue json) {
 		game = new CardGame(json);
+		Gdx.app.log("GameHandler", "Game Loaded");
 		//screen.setHand(game.getHandCards());
-		this.checkIsTurn();
+		//this.checkIsTurn();
+		//Gdx.app.log("GameHandler", "Turn checked");
+		loaded = true;
 	}
 
 	public void setFaceUpCard(String card) {
@@ -92,7 +116,7 @@ public class GameHandler {
 
 		callBack = new WebCallback();
 		DataSender aSender = new DataSender();
-		aSender.loadGameData(game.getGameID(), callBack, this);
+		aSender.loadGameData(gameID, callBack, this);
 	}
 
 	private void checkIsTurn() {

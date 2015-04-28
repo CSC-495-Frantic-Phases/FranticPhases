@@ -396,7 +396,7 @@ public class DataSender {
 		 });
 	}
 	private void parseAckData(JsonValue theResult, WebCallback _theCallback){
-		Gdx.app.log("DATA SENDER",theResult.toString());
+		//Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		
@@ -408,7 +408,7 @@ public class DataSender {
 	}
 
 	private void parseFaceUpData(JsonValue theResult, WebCallback _theCallback, GameHandler handler){
-		Gdx.app.log("DATA SENDER",theResult.toString());
+		//Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		if (result){
@@ -421,7 +421,7 @@ public class DataSender {
 	}
 	
 	private void parseGameData(JsonValue theResult, WebCallback _theCallback, GameHandler handler){
-		Gdx.app.log("DATA SENDER",theResult.toString());
+		//Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		if (result){
@@ -431,7 +431,7 @@ public class DataSender {
 		_theCallback.setData(result, message);
 	}
 	private void parseTurnData(JsonValue theResult, WebCallback _theCallback, GameHandler handler){
-		Gdx.app.log("DATA SENDER",theResult.toString());
+		//Gdx.app.log("DATA SENDER",theResult.toString());
 		boolean result = theResult.getBoolean("success");
 		String message = "";
 		if (result){

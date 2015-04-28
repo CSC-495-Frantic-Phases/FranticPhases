@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
+import edu.oswego.franticphases.datasending.GameHandler;
 import edu.oswego.franticphases.datasending.Handler;
 import edu.oswego.franticphases.gamelogic.CardGame;
 import edu.oswego.franticphases.screens.CreateAGameScreen;
@@ -24,6 +26,7 @@ import edu.oswego.franticphases.screens.CreateAccountScreen;
 import edu.oswego.franticphases.screens.GameScreen;
 import edu.oswego.franticphases.screens.GameSelectScreen;
 import edu.oswego.franticphases.screens.HelpScreen;
+import edu.oswego.franticphases.screens.LoadingScreen;
 import edu.oswego.franticphases.screens.LoginScreen;
 import edu.oswego.franticphases.screens.MainScreen;
 import edu.oswego.franticphases.screens.SettingsScreen;
@@ -58,6 +61,7 @@ public class FranticPhases extends Game implements SettingsObserver{
 	private HelpScreen helpScreen;
 	private GameSelectScreen gsScreen;
 	private CreateAGameScreen createGameScreen;
+	private LoadingScreen loadingScreen;
 	
 	private Settings settings;
 	private Stage stage;
@@ -68,7 +72,7 @@ public class FranticPhases extends Game implements SettingsObserver{
 	private SpriteBatch batch;
 	private int width;
 	private int height;
-	private CardGame currentGame;
+	private String currentGameID;
 	
 	
 
@@ -89,12 +93,9 @@ public class FranticPhases extends Game implements SettingsObserver{
 		showMainScreen();
 	}
 	
+	
 	private void loadAssets(){
-		String cardFile = "data/cards/Blue1.png";
-		if (!assetManager.isLoaded(cardFile)) {
-			assetManager.load(cardFile, Texture.class);
-			assetManager.finishLoading();
-		}
+		
 		//music = assetManager.get(musicFile, Music.class);
 	}
 	
@@ -106,9 +107,10 @@ public class FranticPhases extends Game implements SettingsObserver{
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 	}
 	
-	public void setGame(CardGame g){
-		currentGame = g;
+	public void setGame(String g){
+		currentGameID = g;
 	}
+
 	
 	public SpriteBatch getSpriteBatch() {
 		return batch;
@@ -117,8 +119,8 @@ public class FranticPhases extends Game implements SettingsObserver{
 		return font;
 	}
 	
-	public CardGame getCurrentGame(){
-		return currentGame;
+	public String getCurrentGameID(){
+		return currentGameID;
 	}
 	
 	public void showMainScreen() {
@@ -131,13 +133,23 @@ public class FranticPhases extends Game implements SettingsObserver{
 		setScreen(mainScreen);
 	}
 	
-	public void showGameScreen() {
+	public void showGameScreen(GameHandler h) {
 		if (gameScreen != null) {
 			gameScreen.dispose();
 		}
-		screenStack.push(getScreen());
-		gameScreen = new GameScreen(this);
+		
+		//screenStack.push(getScreen());
+		gameScreen = new GameScreen(this, h);
 		setScreen(gameScreen);
+	}
+	
+	public void loadGame(){
+		if (loadingScreen != null) {
+			loadingScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		loadingScreen = new LoadingScreen(this);
+		setScreen(loadingScreen);
 	}
 	
 	public void showLoginScreen() {

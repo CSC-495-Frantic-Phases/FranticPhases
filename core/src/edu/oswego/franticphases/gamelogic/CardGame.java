@@ -42,9 +42,13 @@ public class CardGame {
 		}
 	}
 	
-	public CardGame(String gameid){
+	public CardGame(){
 		players = new ArrayList<Player>();
-		gameID = gameid;
+	}
+	
+	public Player getPlayerData(String playerID){
+		int id = Integer.parseInt(playerID);
+		return players.get(id);
 	}
 	
 	public void setGameID(String id){
@@ -116,6 +120,10 @@ public class CardGame {
 		return myHand.getCards();
 	}
 	
+	public ArrayList<String> getHandCardsStrings(){
+		return myHand.getCardsString();
+	}
+	
 	public Hand getHand(){
 		return myHand;
 	}
@@ -137,6 +145,7 @@ public class CardGame {
 	}
 	
 	public String getFaceUpCard(){
+		Gdx.app.log("Card Game", "fc: "+faceUpCard);
 		return faceUpCard;
 	}
 	

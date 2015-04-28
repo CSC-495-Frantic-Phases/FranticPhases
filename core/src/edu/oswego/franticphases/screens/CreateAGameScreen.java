@@ -41,10 +41,10 @@ public class CreateAGameScreen extends AbstractScreen{
 		super(game);
 		handler = hand;
 		this.getAllUsers();
-		newGame = new CardGame("maybe messed up");
-		//selectedUsers = new ArrayList<Player>();
+		newGame = new CardGame();
+		
 		Player me = new Player(Settings.getUsername(), Settings.getUserID());
-		//selectedUsers.add(me);
+	
 		newGame.addPlayer(me);
 	}
 
@@ -149,8 +149,8 @@ public class CreateAGameScreen extends AbstractScreen{
 			go.setVisible(false);
 		}
 		if(handler.isNewGameUpdated()){
-			game.setGame(new CardGame(handler.getNewGameID()));
-			game.showGameScreen();
+			game.setGame(handler.getNewGameID());
+			game.loadGame();
 		}
 	}
 

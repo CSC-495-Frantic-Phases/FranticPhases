@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
 import edu.oswego.franticphases.objects.Audible;
+import edu.oswego.franticphases.objects.FaceUpCard;
 import edu.oswego.franticphases.objects.HandCardObject;
 import edu.oswego.franticphases.objects.MapRenderable;
 import edu.oswego.franticphases.objects.WorldObject;
@@ -30,7 +31,7 @@ public class Phase implements Disposable, Audible {
 	// NOTE: 1/64 means 1px end up being about 1.6cm in world physics
 	private final UnitScale scale = new UnitScale(1f/64f);
 
-	private final int phase;
+	private final String phase;
 	private boolean failed = false;
 	private State currentState;
 
@@ -45,13 +46,14 @@ public class Phase implements Disposable, Audible {
 	private final Collection<WorldUpdateable> updateableObjects;
 	private final Collection<Audible> audibleObjects;
 	private ArrayList<HandCardObject> hand;
+	private FaceUpCard faceupCard;
 
-	public Phase(int phase, String filename, 
+	public Phase(String phase, String filename, 
 			WorldPopulator populator, AssetManager assetManager) {
 		this.phase = phase;
 		currentState = State.NOT_STARTED;
 
-		map = loadMap(filename);
+		map = loadMap("phase.tmx");
 
 		mapWidth = map.getProperties().get("width", Integer.class)
 				* map.getProperties().get("tilewidth", Integer.class);
@@ -67,7 +69,7 @@ public class Phase implements Disposable, Audible {
 		audibleObjects.add(this);
 
 		hand = populator.populateWorldFromMap(this, map, world, scale);
-		
+		faceupCard = populator.getfCard();
 //		playSound = true;
 //		String soundFile = "data/soundfx/failure-2.mp3";
 //		if (!assetManager.isLoaded(soundFile)) {
@@ -78,6 +80,10 @@ public class Phase implements Disposable, Audible {
 
 		//contactListener = new OurCollisionListener();
 		//world.setContactListener(contactListener);
+	}
+	
+	public FaceUpCard getfCard(){
+		return faceupCard;
 	}
 
 	public TiledMap getMap() {
@@ -153,7 +159,7 @@ public class Phase implements Disposable, Audible {
 		throw new RuntimeException("data/" + file + " does not exist");
 	}
 
-	public int getPhaseNumber() {
+	public String getPhaseNumber() {
 		return phase;
 	}
 

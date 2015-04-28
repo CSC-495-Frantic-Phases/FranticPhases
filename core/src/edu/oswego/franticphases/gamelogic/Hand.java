@@ -2,6 +2,7 @@ package edu.oswego.franticphases.gamelogic;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.JsonValue;
 
 import edu.oswego.franticphases.datasending.GameSession;
@@ -10,16 +11,43 @@ public class Hand {
 
 	private String handID;
 	private ArrayList<Card> cards;   // The cards in the hand.
+	private ArrayList<String> cardsAsStrings;
 
     public Hand() {
         cards = new ArrayList<Card>();
+        
     }
     
 	public Hand(JsonValue json){
+		cardsAsStrings = new ArrayList<String>();
 		for(int i = 0; i < json.size; i++){
 			JsonValue tmp = json.get(i);
 			handID = tmp.getString("handID");
-		
+			
+			String cardID = tmp.getString("card01");
+			
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card02");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card03");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card04");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card05");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card06");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card07");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card08");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card09");
+			cardsAsStrings.add(cardID);
+			cardID = tmp.getString("card10");
+			cardsAsStrings.add(cardID);
+			
+			Gdx.app.log("Hand", "Loaded handID: " + handID);
+			
 			
 		}
 	}
@@ -141,6 +169,10 @@ public class Hand {
 
 	public ArrayList<Card> getCards(){
 		return cards;
+	}
+	
+	public ArrayList<String> getCardsString(){
+		return cardsAsStrings;
 	}
 	
 }

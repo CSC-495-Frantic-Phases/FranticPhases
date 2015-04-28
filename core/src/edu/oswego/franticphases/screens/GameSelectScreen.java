@@ -88,8 +88,8 @@ public class GameSelectScreen extends AbstractScreen  {
 		playGame.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setGame(new CardGame(selectedGame.getGameID()));
-				game.showGameScreen();
+				game.setGame(selectedGame.getGameID());
+				game.loadGame();
 			}
 		});
 		table.row();

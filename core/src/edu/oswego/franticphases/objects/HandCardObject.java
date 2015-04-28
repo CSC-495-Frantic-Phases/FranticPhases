@@ -29,7 +29,7 @@ public class HandCardObject extends AbstractWorldObject implements Disposable, A
 	private boolean visible = true;
 	private final TextureAtlas atlas;
 	private final String soundFile = "data/soundfx/boing1.mp3";
-	private final String atlasFile = "data/WorldObjects/worldObjects.txt";
+	private final String atlasFile = "data/WorldObjects/cards.txt";
 	private final UnitScale scale;
 	private float width;
 	private float height;
@@ -63,8 +63,8 @@ public class HandCardObject extends AbstractWorldObject implements Disposable, A
 	
 	public void setGraphic(String cardID){
 		Sprite sprite = atlas.createSprite(cardID);
-		//sprite.setSize(width, height);
-		Gdx.app.log("HandCardObject", "height: " + sprite.getHeight()+" width: " +sprite.getWidth());
+		sprite.setScale(0.35f);
+		//Gdx.app.log("HandCardObject", "Loaded card: " + cardID);
 		
 		graphic = new SpriteGraphic(sprite);
 		

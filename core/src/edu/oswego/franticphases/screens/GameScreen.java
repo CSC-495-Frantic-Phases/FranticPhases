@@ -12,7 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import edu.oswego.franticphases.FranticPhases;
 import edu.oswego.franticphases.datasending.GameHandler;
 import edu.oswego.franticphases.dialogs.PauseDialog;
-import edu.oswego.franticphases.gamelogic.CardController;
+import edu.oswego.franticphases.gamelogic.Card;
+import edu.oswego.franticphases.gamelogic.Controller;
 import edu.oswego.franticphases.gamelogic.DebugPhaseRenderer;
 import edu.oswego.franticphases.gamelogic.DefaultPhaseRenderer;
 import edu.oswego.franticphases.gamelogic.Phase;
@@ -33,18 +34,20 @@ public class GameScreen extends AbstractScreen  {
 	private Phase phase;
 	
 	
-	public GameScreen(FranticPhases game) {
+	public GameScreen(FranticPhases game, GameHandler h) {
 		super(game);
 		//hud = new Hud(this, skin);
 		assetManager = game.getAssetManager();
-		handler = new GameHandler(this, game.getCurrentGame());
+		handler = h;
+		
 		worldPopulator = new WorldPopulator(game.getAssetManager());
 		this.loadGameData();
 	}
 	
 	private void loadGameData(){
-		handler.loadGame();
+	
 		changeState(State.WAITING);
+		
 		Gdx.app.log("GameScreen", "Loading Phase");
 		if (phase != null) {
 			phase.dispose();
@@ -56,18 +59,19 @@ public class GameScreen extends AbstractScreen  {
 		}
 		
 		Gdx.app.log("GameScreen", "Cleaned up previous phase");
-		int num = 0;//gotta load current phase from cardGame
+		String num = handler.getPhaseNumber();//gotta load current phase from cardGame
 		phase = new Phase(num,
-				game.getPhases().get(num),
+				"phase.tmx",
 				worldPopulator, game.getAssetManager());
 		Gdx.app.log("GameScreen", "Phase loaded");
 		
 		ArrayList<HandCardObject> hand = phase.getHand();
-		
-		for(HandCardObject c:hand){
-			stage.addActor(c);
+		ArrayList<String> cards = handler.getCards();
+		for(int i = 0; i < hand.size(); i++){
+			hand.get(i).setGraphic(cards.get(i));
 		}
-
+		phase.getfCard().setGraphic(handler.getFaceUpCard());
+		
 		renderer = new DefaultPhaseRenderer(phase,
 				game.getWidth(), game.getHeight(),
 				game.getSpriteBatch(),
@@ -131,8 +135,13 @@ public class GameScreen extends AbstractScreen  {
 	
 	@Override
 	public void show() {
+		//set all the input processors here
+		//first should be the hud
+		//then the game
+		//then the back button
 		Gdx.input.setInputProcessor(inputMux);
 		inputMux.addProcessor(stage);
+		
 		inputMux.addProcessor(new InputAdapter() {
 			@Override
 			public boolean keyDown(int keycode) {
@@ -143,8 +152,7 @@ public class GameScreen extends AbstractScreen  {
 				return super.keyDown(keycode);
 			}
 		});
-		CardController controller = new CardController();
-		stage.addListener(controller);
+		
 		currentState.show(this);
 	}
 	

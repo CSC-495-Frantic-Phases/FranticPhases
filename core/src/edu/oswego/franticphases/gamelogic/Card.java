@@ -59,10 +59,10 @@ public class Card {
     */
    public String getSuitAsString() {
       switch ( suit ) {
-      case YELLOW:   return "Yellow";
-      case BLUE:   return "Blue";
-      case GREEN: return "Green";
-      default:    return "Red";
+      case YELLOW:   return "yellow";
+      case BLUE:   return "blue";
+      case GREEN: return "green";
+      default:    return "red";
       }
    }
    
@@ -87,8 +87,8 @@ public class Card {
          case 10:  return "10";
          case 11:  return "11";
          case 12:  return "12";
-         case 13:  return "Wild";
-         default:  return "Skip";
+         case 13:  return "W";
+         default:  return "S";
          
       }
    }
@@ -99,6 +99,10 @@ public class Card {
     */
    public String toString() {
          return getValueAsString() + " of " + getSuitAsString();
+   }
+   
+   public String getCardID(){
+	   return getSuitAsString() + getValueAsString();
    }
    
 

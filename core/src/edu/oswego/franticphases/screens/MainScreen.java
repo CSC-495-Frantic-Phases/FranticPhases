@@ -58,17 +58,9 @@ public class MainScreen extends AbstractScreen {
 		play.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				if (!Settings.getUsername().equals("")) {
-					autoLoginCallBack = new WebCallback();
-					DataSender aSender = new DataSender();
-					aSender.login(Settings.getUsername(),
-							Settings.getPassword(), autoLoginCallBack);
-					// isAutoLogging = true;
+				
 					game.showGameSelectionScreen();
-				} else {
-					Dialog ld = new LoginDialog("Login", skin, game).show(game
-							.getStage());
-				}
+
 			}
 		});
 		table.row();

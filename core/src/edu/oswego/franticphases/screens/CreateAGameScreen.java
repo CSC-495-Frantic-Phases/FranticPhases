@@ -26,10 +26,7 @@ import edu.oswego.franticphases.settings.Settings;
 
 public class CreateAGameScreen extends AbstractScreen{
 	InputMultiplexer inputMux = new InputMultiplexer();
-	private WebCallback callBack;
-	private Handler handler;
 	boolean debug = true;
-	boolean hasUsers = false;
 	CardGame newGame;
 	Table userData;
 	ArrayList<Player> users;
@@ -37,14 +34,11 @@ public class CreateAGameScreen extends AbstractScreen{
 	
 	
 	
-	public CreateAGameScreen(FranticPhases game, Handler hand) {
+	public CreateAGameScreen(FranticPhases game) {
 		super(game);
-		handler = hand;
-		this.getAllUsers();
+	    users = game.getUsers();
 		newGame = new CardGame();
-		
 		Player me = new Player(Settings.getUsername(), Settings.getUserID());
-	
 		newGame.addPlayer(me);
 	}
 
@@ -96,25 +90,13 @@ public class CreateAGameScreen extends AbstractScreen{
 		go.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				
 				newGame.createDeck();
-				
-				callBack = new WebCallback();
-				DataSender aSender = new DataSender();
-				aSender.createGame(newGame, callBack, handler);		
-
-        		
-				System.out.println("LOADING");
-				
-		}
+				game.createGame(newGame);	
+		     }
 		});
-		
-		
 	}
 	@Override
 	protected void preStageRenderHook(float delta){
-		if(handler.isUsersUpdated()){
-		users = handler.getUsers();
 		userData.clear();
 		userData.row();
 		userData.add("Select friends to play with!").padRight(50).padLeft(50);
@@ -133,7 +115,6 @@ public class CreateAGameScreen extends AbstractScreen{
 					}else{
 						newGame.addPlayer(users.get(tmp));
 					}
-					
 				}
 				
 			});
@@ -142,23 +123,11 @@ public class CreateAGameScreen extends AbstractScreen{
 			userData.add(box).padRight(50);
 			}
 		}
-		}
+		
 		if(newGame.getNumPlayers()==4){
 			go.setVisible(true);
 		}else{
 			go.setVisible(false);
 		}
-		if(handler.isNewGameUpdated()){
-			game.setGame(handler.getNewGameID());
-			game.loadGame();
-		}
-	}
-
-	private void getAllUsers(){
-		callBack = new WebCallback();
-		DataSender aSender = new DataSender();
-		aSender.getUsers( callBack, handler);
-		hasUsers = callBack.getResult();
 	}	
-	
 }

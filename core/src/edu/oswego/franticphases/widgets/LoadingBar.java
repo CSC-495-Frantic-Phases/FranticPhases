@@ -1,6 +1,7 @@
 package edu.oswego.franticphases.widgets;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -18,11 +19,15 @@ public class LoadingBar extends Actor {
 
     @Override
     public void act(float delta) {
+    	super.act(delta);
+    	
         stateTime += delta;
         reg = animation.getKeyFrame(stateTime);
     }
 
-    public void draw(SpriteBatch batch, float parentAlpha) {
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+    	
         batch.draw(reg, getX(), getY());
     }
 }

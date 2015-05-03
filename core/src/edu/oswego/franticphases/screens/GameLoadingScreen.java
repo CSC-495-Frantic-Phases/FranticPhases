@@ -4,21 +4,24 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 import edu.oswego.franticphases.FranticPhases;
+import edu.oswego.franticphases.datasending.DataSender;
 import edu.oswego.franticphases.datasending.GameHandler;
+import edu.oswego.franticphases.datasending.Handler;
+import edu.oswego.franticphases.datasending.WebCallback;
+import edu.oswego.franticphases.dialogs.LoginDialog;
+import edu.oswego.franticphases.gamelogic.CardGame;
+import edu.oswego.franticphases.settings.Settings;
 import edu.oswego.franticphases.widgets.LoadingBar;
 
-public class LoadingScreen extends AbstractScreen{
+public class GameLoadingScreen extends AbstractScreen{
 
     private Image logo;
     private Image loadingFrame;
@@ -30,22 +33,29 @@ public class LoadingScreen extends AbstractScreen{
 
     private float startX, endX;
     private float percent;
-    private GameHandler handler;
+    private GameHandler ghandler;
+    private Handler handler;
+    private WebCallback callBack;
 
     private Actor loadingBar;
+    private String id;
+    private CardGame cardGame;
+    private boolean newGame;
+    private boolean gameCreated = false;
+    private boolean gameLoading = false;
 
-    public LoadingScreen(FranticPhases game) {
+    public GameLoadingScreen(FranticPhases game, CardGame cardGame, boolean newGame) {
         super(game);
+        id = cardGame.getGameID();
+        this.cardGame = cardGame;
+        this.newGame = newGame;
     }
 
     @Override
     public void show() {
         // Tell the manager to load assets for the loading screen
     	manager = game.getAssetManager();
-        manager.load("data/loading.pack", TextureAtlas.class);
-        // Wait until they are finished loading
-        manager.finishLoading();
-
+        
         // Get our textureatlas from the manager
         TextureAtlas atlas = manager.get("data/loading.pack", TextureAtlas.class);
 
@@ -72,18 +82,34 @@ public class LoadingScreen extends AbstractScreen{
         stage.addActor(loadingFrame);
         stage.addActor(logo);
         
-        handler = new GameHandler(game.getCurrentGameID());
+        if(newGame){
+          handler = new Handler();
+        }
+        ghandler = new GameHandler(id);
 
 
         // Add everything to be loaded, for instance:
-        //all sounds/music and images
-		handler.loadGame();
 		//manager.load("data/WorldObjects/worldObjects.txt", TextureAtlas.class);
-        // game.manager.load("data/assets1.pack", TextureAtlas.class);
-        // game.manager.load("data/assets2.pack", TextureAtlas.class);
-        // game.manager.load("data/assets3.pack", TextureAtlas.class);
+		
+        
     }
     
+    private void createGame(){
+    	if(!gameCreated){
+    	  callBack = new WebCallback();
+		  DataSender aSender = new DataSender();
+		  aSender.createGame(cardGame, callBack, handler);
+		  gameCreated = true;
+    	}
+		
+    }
+    
+    private void loadGame(){
+    	if(!gameLoading){
+    	  ghandler.loadGame();
+    	  gameLoading = true;
+    	}
+    }
     
 
     @Override
@@ -125,36 +151,54 @@ public class LoadingScreen extends AbstractScreen{
     public void preStageRenderHook(float delta) {
         // Clear the screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        boolean done = false;
 
-        if (manager.update()) { // Load some, will return true if done loading
-            if(handler.isGameLoaded()){
-            	if (Gdx.input.isTouched()) { // If the screen is touched after the game is done loading, go to the game screen
-            		stage.clear();
-            		game.showGameScreen(handler);
-            	}
-            }
-        }
-
+       if(newGame){
+    	   this.createGame();
+    	   	if(callBack.getRecieved()){//did create game ack
+    	   		if(callBack.getResult()){//did we create the game
+        	        newGame = false;
+    	   			
+    	   		}else{//didnt login something went wrong
+        	   
+    	   		}  
+    	   	}
+       }else{
+    	   this.loadGame();
+    	   if(ghandler.isGameLoaded()){
+    		   done = true;
+    	   }
+       }
+        
         // Interpolate the percentage to make it more smooth
-        percent = Interpolation.linear.apply(percent, manager.getProgress(), 0.1f);
+       float status = 0;
+       
+       if(callBack.getRecieved()){
+       	status += 0.25f;
+       }
+       if(ghandler.isGameLoaded()){
+    	   status += 0.50f;
+       }
+       									//start   end     a
+       percent = Interpolation.linear.apply(percent, status, 0.1f);
 
         // Update positions (and size) to match the percentage
-        if(!handler.isGameLoaded()){
-        	percent = percent - 20;
-        }
         loadingBarHidden.setX(startX + endX * percent);
         loadingBg.setX(loadingBarHidden.getX() + 30);
         loadingBg.setWidth(450 - 450 * percent);
         loadingBg.invalidate();
 
-        // Show the loading screen
-        //stage.act();
-        //stage.draw();
+        if(done && manager.update()){
+        	if (Gdx.input.isTouched()) {
+        	  stage.clear();
+              game.showGameScreen(ghandler);
+        	}
+        }
     }
 
     @Override
     public void hide() {
         // Dispose the loading assets as we no longer need them
-        manager.unload("data/loading.pack");
+        //manager.unload("data/loading.pack");
     }
 }

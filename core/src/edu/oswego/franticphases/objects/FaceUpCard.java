@@ -1,22 +1,16 @@
 package edu.oswego.franticphases.objects;
 
-	import com.badlogic.gdx.Gdx;
 	import com.badlogic.gdx.assets.AssetManager;
-	import com.badlogic.gdx.audio.Sound;
-	import com.badlogic.gdx.graphics.g2d.Sprite;
-	import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-	import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-	import com.badlogic.gdx.physics.box2d.Body;
-	import com.badlogic.gdx.physics.box2d.Fixture;
-	import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-	import com.badlogic.gdx.scenes.scene2d.Actor;
-	import com.badlogic.gdx.scenes.scene2d.InputEvent;
-	import com.badlogic.gdx.scenes.scene2d.InputListener;
-	import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.utils.Disposable;
 
-	import edu.oswego.franticphases.gamelogic.UnitScale;
-	import edu.oswego.franticphases.graphics.GraphicComponent;
-	import edu.oswego.franticphases.graphics.SpriteGraphic;
+import edu.oswego.franticphases.gamelogic.UnitScale;
+import edu.oswego.franticphases.graphics.GraphicComponent;
+import edu.oswego.franticphases.graphics.SpriteGraphic;
 
 
 	public class FaceUpCard extends AbstractWorldObject implements Disposable, Audible, MapRenderable {

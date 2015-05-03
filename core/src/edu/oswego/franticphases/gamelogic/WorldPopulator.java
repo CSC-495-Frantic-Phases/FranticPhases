@@ -27,6 +27,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Disposable;
 
 import edu.oswego.franticphases.graphics.GraphicComponent;
@@ -45,8 +47,8 @@ public class WorldPopulator implements Disposable{
 	private FaceUpCard faceupCard;
 	public WorldPopulator(AssetManager assetManager) {
 		this.assetManager = assetManager;
-		assetManager.load(atlasFile, TextureAtlas.class);
-		assetManager.finishLoading();
+		//assetManager.load(atlasFile, TextureAtlas.class);
+		//assetManager.finishLoading();
 		atlas = assetManager.get(atlasFile, TextureAtlas.class);
 	}
 	public ArrayList<HandCardObject> populateWorldFromMap(Phase level,TiledMap map, World world,
@@ -57,7 +59,9 @@ public class WorldPopulator implements Disposable{
 			if (obj.getName() != null) {
 				if (obj.getName().equals("card")) {
 					HandCardObject card = createCard(obj, world, scale);
+					
 					level.addWorldObject(card);
+					
 					hand.add(card);
 				}else if(obj.getName().equals("faceup")) {
 					faceupCard = createFaceup(obj, world, scale);

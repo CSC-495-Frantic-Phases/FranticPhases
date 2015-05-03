@@ -20,7 +20,7 @@
   <object name="card" x="379" y="325" width="54" height="76"/>
   <object name="card" x="448" y="325" width="54" height="76"/>
   <object name="card" x="523" y="323" width="54" height="76"/>
-  <object name="card" x="666" y="325" width="71" height="95"/>
+  <object name="card" x="667" y="323" width="56" height="75"/>
   <object name="card" x="597" y="324" width="54" height="76"/>
   <object name="deck" x="606" y="160" width="71" height="95"/>
   <object name="faceup" x="515" y="161" width="71" height="95"/>

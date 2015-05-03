@@ -75,10 +75,10 @@ public class LoginScreen extends AbstractScreen implements TextInputListener{
 					Settings.setPassword(password);
 					
 					waitingForResponse = false;
-					game.showGameSelectionScreen();
+					game.loadGameData();
 				}else{
 					waitingForResponse = false;
-					game.showMainScreen();
+					game.loadGameData();
 					//show some sort of popup that login failed
 				}
 			}

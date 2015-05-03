@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -19,10 +16,13 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 import edu.oswego.franticphases.datasending.GameHandler;
+import edu.oswego.franticphases.datasending.GameSession;
 import edu.oswego.franticphases.datasending.Handler;
 import edu.oswego.franticphases.gamelogic.CardGame;
+import edu.oswego.franticphases.gamelogic.Player;
 import edu.oswego.franticphases.screens.CreateAGameScreen;
 import edu.oswego.franticphases.screens.CreateAccountScreen;
+import edu.oswego.franticphases.screens.GameLoadingScreen;
 import edu.oswego.franticphases.screens.GameScreen;
 import edu.oswego.franticphases.screens.GameSelectScreen;
 import edu.oswego.franticphases.screens.HelpScreen;
@@ -62,6 +62,7 @@ public class FranticPhases extends Game implements SettingsObserver{
 	private GameSelectScreen gsScreen;
 	private CreateAGameScreen createGameScreen;
 	private LoadingScreen loadingScreen;
+	private GameLoadingScreen gLoadingScreen;
 	
 	private Settings settings;
 	private Stage stage;
@@ -72,7 +73,9 @@ public class FranticPhases extends Game implements SettingsObserver{
 	private SpriteBatch batch;
 	private int width;
 	private int height;
-	private String currentGameID;
+	
+	private ArrayList<GameSession> allMyGames;
+	private ArrayList<Player> users;
 	
 	
 
@@ -82,7 +85,7 @@ public class FranticPhases extends Game implements SettingsObserver{
 		settings = new Settings();
 		settings.addObserver(this);
 		assetManager = new AssetManager();
-		loadAssets();
+		
 		font = new BitmapFont();
 		loadSkin();
 		width = 480;//480
@@ -90,13 +93,15 @@ public class FranticPhases extends Game implements SettingsObserver{
 		ScalingViewport svp = new ScalingViewport(Scaling.stretch, width, height);
 		stage = new Stage(svp, batch);
 		
-		showMainScreen();
+		this.loadGameData();
 	}
 	
+	public ArrayList<GameSession> getMyGames(){
+		return allMyGames;
+	}
 	
-	private void loadAssets(){
-		
-		//music = assetManager.get(musicFile, Music.class);
+	public ArrayList<Player> getUsers(){
+		return users;
 	}
 	
 	public AssetManager getAssetManager(){
@@ -107,11 +112,6 @@ public class FranticPhases extends Game implements SettingsObserver{
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 	}
 	
-	public void setGame(String g){
-		currentGameID = g;
-	}
-
-	
 	public SpriteBatch getSpriteBatch() {
 		return batch;
 	}
@@ -119,17 +119,13 @@ public class FranticPhases extends Game implements SettingsObserver{
 		return font;
 	}
 	
-	public String getCurrentGameID(){
-		return currentGameID;
-	}
-	
 	public void showMainScreen() {
 		if (mainScreen == null) {
 			mainScreen = new MainScreen(this);
 		}
-		if (getScreen() != null) {
-			screenStack.push(getScreen());
-		}
+		//if (getScreen() != null) {
+		//	screenStack.push(getScreen());
+		//}
 		setScreen(mainScreen);
 	}
 	
@@ -143,13 +139,35 @@ public class FranticPhases extends Game implements SettingsObserver{
 		setScreen(gameScreen);
 	}
 	
-	public void loadGame(){
+	public void loadGameData(){//load all assets and such at app launch
 		if (loadingScreen != null) {
 			loadingScreen.dispose();
 		}
-		screenStack.push(getScreen());
+		//screenStack.push(getScreen());
 		loadingScreen = new LoadingScreen(this);
 		setScreen(loadingScreen);
+	}
+	
+	public void createGame(CardGame newGame){
+		if (gLoadingScreen != null) {
+			gLoadingScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		gLoadingScreen = new GameLoadingScreen(this, newGame, true);
+		setScreen(gLoadingScreen);
+		
+	}
+	
+	public void loadGame(GameSession selectedGame){
+		if (gLoadingScreen != null) {
+			gLoadingScreen.dispose();
+		}
+		screenStack.push(getScreen());
+		CardGame cg = new CardGame();
+		cg.setGameID(selectedGame.getGameID());
+		gLoadingScreen = new GameLoadingScreen(this, cg, false);
+		setScreen(gLoadingScreen);
+		
 	}
 	
 	public void showLoginScreen() {
@@ -170,12 +188,12 @@ public class FranticPhases extends Game implements SettingsObserver{
 		setScreen(caScreen);
 	}
 	
-	public void showCreateAGameScreen(Handler handler) {
+	public void showCreateAGameScreen() {
 		if (createGameScreen != null) {
 			createGameScreen.dispose();
 		}
 		screenStack.push(getScreen());
-		createGameScreen = new CreateAGameScreen(this, handler);
+		createGameScreen = new CreateAGameScreen(this);
 		setScreen(createGameScreen);
 	}
 	
@@ -235,8 +253,9 @@ public class FranticPhases extends Game implements SettingsObserver{
 	@Override
 	public void dispose() {
 
-		mainScreen.dispose();
-
+		if(mainScreen != null){
+		    mainScreen.dispose();
+		}
 		if (gameScreen != null) {
 			gameScreen.dispose();
 		}
@@ -252,6 +271,19 @@ public class FranticPhases extends Game implements SettingsObserver{
 		if (caScreen != null) {
 			caScreen.dispose();
 		}
+		if (gsScreen != null) {
+			gsScreen.dispose();
+		}
+		if (createGameScreen != null) {
+			createGameScreen.dispose();
+		}
+		if (loadingScreen != null) {
+			loadingScreen.dispose();
+		}
+		if (gLoadingScreen != null) {
+			gLoadingScreen.dispose();
+		}
+
 		stage.dispose();
 		batch.dispose();
 

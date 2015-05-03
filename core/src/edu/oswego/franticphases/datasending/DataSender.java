@@ -46,6 +46,7 @@ public class DataSender {
 		 
 		        public void failed(Throwable t) {
 		        	Gdx.app.log("DATA SENDER","Create New Account Failed " + t.getMessage());
+		        	_theCallback.setData(false, t.getMessage());
 		        }
 
 				@Override
@@ -55,6 +56,7 @@ public class DataSender {
 				}
 		 });
 	}
+	
 	
 	public void login(String _name, String _password, final WebCallback _theCallback){
 		if(debug){
@@ -66,6 +68,8 @@ public class DataSender {
 		HttpRequest httpPost = new HttpRequest(HttpMethods.POST);
 		httpPost.setUrl("http://moxie.cs.oswego.edu/~maestri/login.php");
 		httpPost.setContent(HttpParametersUtils.convertHttpParameters(parameters));
+		
+		
 		Gdx.net.sendHttpRequest (httpPost, new HttpResponseListener() {
 		        public void handleHttpResponse(HttpResponse httpResponse) {
 		        	InputStream is = httpResponse.getResultAsStream();
@@ -76,6 +80,7 @@ public class DataSender {
 		 
 		        public void failed(Throwable t) {
 		        	Gdx.app.log("DATA SENDER","Failed in login " + t.getMessage());
+		        	_theCallback.setData(false, t.getMessage());
 		        }
 
 				@Override
@@ -106,6 +111,7 @@ public class DataSender {
 		 
 		        public void failed(Throwable t) {
 		        	Gdx.app.log("DATA SENDER","Failed in get games " + t.getMessage());
+		        	_theCallback.setData(false, t.getMessage());
 		        }
 
 				@Override
@@ -133,6 +139,7 @@ public class DataSender {
 		 
 		        public void failed(Throwable t) {
 		        	Gdx.app.log("DATA SENDER","Failed in get users " + t.getMessage());
+		        	_theCallback.setData(false, t.getMessage());
 		        }
 
 				@Override
@@ -192,6 +199,7 @@ public class DataSender {
 		 
 		        public void failed(Throwable t) {
 		        	Gdx.app.log("DATA SENDER","Failed in create game " + t.getMessage());
+		        	_theCallback.setData(false, t.getMessage());
 		        }
 
 				@Override

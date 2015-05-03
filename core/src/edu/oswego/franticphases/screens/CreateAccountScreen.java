@@ -74,10 +74,10 @@ public class CreateAccountScreen extends AbstractScreen implements TextInputList
 				if(accountCreationCB.getResult()){
 					Settings.setUsername(username);
 					Settings.setPassword(password);
-					game.showGameSelectionScreen();
+					game.loadGameData();
 					waitingForResponse = false;
 				}else{
-					game.showMainScreen();
+					game.loadGameData();
 					waitingForResponse = false;
 					//some sort of popup that creation failed
 				}

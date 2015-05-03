@@ -1,5 +1,6 @@
 package edu.oswego.franticphases.datasending;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.JsonValue;
 
 import edu.oswego.franticphases.settings.Settings;
@@ -7,7 +8,7 @@ import edu.oswego.franticphases.settings.Settings;
 public class WebCallback {
 	
 	private boolean isRecieved = false;
-	private boolean debug = false;
+	private boolean debug = true;
 	private boolean success;
 	
 	private String message;
@@ -36,7 +37,7 @@ public class WebCallback {
 	
 	public void setData(boolean _result, String _message, String id){
 		if(debug){
-			System.out.println("Data set in CB");
+			Gdx.app.log("Callback", _message);
 		}
 		isRecieved = true;
 		success = _result;
@@ -46,7 +47,7 @@ public class WebCallback {
 	
 	public void setData(boolean _result, String _message){
 		if(debug){
-			System.out.println("Data set in CB");
+			Gdx.app.log("Callback", _message);
 		}
 		isRecieved = true;
 		success = _result;

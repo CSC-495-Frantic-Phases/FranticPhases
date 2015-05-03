@@ -28,8 +28,6 @@ import edu.oswego.franticphases.widgets.Hud;
 
 public class GameSelectScreen extends AbstractScreen  {
 	InputMultiplexer inputMux = new InputMultiplexer();
-	private WebCallback callBack;
-	private Handler handler;
 	public Table gameData;
 	Button playGame;
 	boolean debug = true;
@@ -38,9 +36,8 @@ public class GameSelectScreen extends AbstractScreen  {
 	
 	public GameSelectScreen(FranticPhases game) {
 		super(game);
-		handler = new Handler();
-		games = new ArrayList<GameSession>();
-		getCurrentGames();
+		games = game.getMyGames();
+		
 	}
 
 	@Override
@@ -79,7 +76,7 @@ public class GameSelectScreen extends AbstractScreen  {
 		newGame.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.showCreateAGameScreen(handler);
+				game.showCreateAGameScreen();
 			}
 		});
 		table.row();
@@ -88,8 +85,7 @@ public class GameSelectScreen extends AbstractScreen  {
 		playGame.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setGame(selectedGame.getGameID());
-				game.loadGame();
+				game.loadGame(selectedGame);
 			}
 		});
 		table.row();
@@ -105,8 +101,7 @@ public class GameSelectScreen extends AbstractScreen  {
 	}
 	@Override
 	protected void preStageRenderHook(float delta){
-		if(handler.isGamesUpdated()){
-		games = handler.getGames();
+		
 		if(games.size()>0){
 		gameData.clear();
 		gameData.row();
@@ -162,21 +157,13 @@ public class GameSelectScreen extends AbstractScreen  {
 			gameData.row();
 			gameData.add("Please create a game below!").padRight(25).padLeft(25);
 		}
-		}if(selectedGame == null){
+		if(selectedGame == null){
 			playGame.setVisible(false);
 		}else{
 			playGame.setVisible(true);
 		}
 		
 
-	}
-
-	
-	private void getCurrentGames(){
-		callBack = new WebCallback();
-		DataSender aSender = new DataSender();
-		aSender.getGames(Settings.getUserID(), callBack, handler);
-		
 	}
 
 }

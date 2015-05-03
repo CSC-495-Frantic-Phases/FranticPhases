@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import edu.oswego.franticphases.FranticPhases;
 import edu.oswego.franticphases.datasending.GameHandler;
 import edu.oswego.franticphases.dialogs.PauseDialog;
-import edu.oswego.franticphases.gamelogic.Card;
 import edu.oswego.franticphases.gamelogic.Controller;
 import edu.oswego.franticphases.gamelogic.DebugPhaseRenderer;
 import edu.oswego.franticphases.gamelogic.DefaultPhaseRenderer;
@@ -68,7 +67,8 @@ public class GameScreen extends AbstractScreen  {
 		ArrayList<HandCardObject> hand = phase.getHand();
 		ArrayList<String> cards = handler.getCards();
 		for(int i = 0; i < hand.size(); i++){
-			hand.get(i).setGraphic(cards.get(i));
+			
+			hand.get(i).setGraphic(cards.get(i), stage);
 		}
 		phase.getfCard().setGraphic(handler.getFaceUpCard());
 		
@@ -77,7 +77,7 @@ public class GameScreen extends AbstractScreen  {
 				game.getSpriteBatch(),
 				game.getAssetManager());
 	
-		renderer = new DebugPhaseRenderer(renderer);
+		//renderer = new DebugPhaseRenderer(renderer);
 		
 		Gdx.app.log("GameScreen", "Renderer created");
 //		audio = new AudioManager(

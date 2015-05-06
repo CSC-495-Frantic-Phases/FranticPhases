@@ -36,6 +36,7 @@ import edu.oswego.franticphases.graphics.SpriteGraphic;
 import edu.oswego.franticphases.objects.DeckObject;
 import edu.oswego.franticphases.objects.FaceUpCard;
 import edu.oswego.franticphases.objects.HandCardObject;
+import edu.oswego.franticphases.objects.PhaseArea;
 
 
 public class WorldPopulator implements Disposable{
@@ -45,10 +46,12 @@ public class WorldPopulator implements Disposable{
 	private final TextureAtlas atlas;
 	private final AssetManager assetManager;
 	private FaceUpCard faceupCard;
+	private DeckObject deckObject;
+	private PhaseArea p;
+	
 	public WorldPopulator(AssetManager assetManager) {
 		this.assetManager = assetManager;
-		//assetManager.load(atlasFile, TextureAtlas.class);
-		//assetManager.finishLoading();
+		
 		atlas = assetManager.get(atlasFile, TextureAtlas.class);
 	}
 	public ArrayList<HandCardObject> populateWorldFromMap(Phase level,TiledMap map, World world,
@@ -59,9 +62,7 @@ public class WorldPopulator implements Disposable{
 			if (obj.getName() != null) {
 				if (obj.getName().equals("card")) {
 					HandCardObject card = createCard(obj, world, scale);
-					
 					level.addWorldObject(card);
-					
 					hand.add(card);
 				}else if(obj.getName().equals("faceup")) {
 					faceupCard = createFaceup(obj, world, scale);
@@ -69,10 +70,13 @@ public class WorldPopulator implements Disposable{
 					faceupCard.setGraphic("back");
 					
 				}else if(obj.getName().equals("deck")) {
-					DeckObject deck = createDeck(obj, world,scale);
-					level.addWorldObject(deck);
-				
-					
+					deckObject = createDeck(obj, world,scale);
+					level.addWorldObject(deckObject);
+					deckObject.setGraphic("back");
+				}else if(obj.getName().equals("phase")){
+					p = createPhaseArea(obj, world,scale);
+					level.addWorldObject(p);
+					p.setGraphic("back");
 				}
 			}
 		}
@@ -81,6 +85,14 @@ public class WorldPopulator implements Disposable{
 	
 	public FaceUpCard getfCard(){
 		return faceupCard;
+	}
+	
+	public DeckObject getDeck(){
+		return deckObject;
+	}
+	
+	public PhaseArea getPArea(){
+		return p;
 	}
 	
 	public HandCardObject createCard(MapObject obj, World world, UnitScale scale) {
@@ -154,13 +166,44 @@ public class WorldPopulator implements Disposable{
 		shape.dispose();
 		Vector2 d = getDimensions(obj);
 
-		Sprite sprite = atlas.createSprite("back");
-		sprite.setScale(0.35f);
+		//Sprite sprite = atlas.createSprite("back");
+		//sprite.setScale(0.35f);
 		//Gdx.app.log("HandCardObject", "Loaded card: " + cardID);
 		
-		GraphicComponent graphic = new SpriteGraphic(sprite);
+		//SpriteGraphic graphic = new SpriteGraphic(1, 1, sprite);
 		
-		return new DeckObject(body,graphic, scale, assetManager, d.x, d.y);
+		return new DeckObject(body, scale, assetManager, d.x, d.y);
+		//return new HandCardObject(body, scale, assetManager, width, height);
+	}
+	
+	public PhaseArea createPhaseArea(MapObject obj, World world, UnitScale scale) {
+		if (!(obj instanceof RectangleMapObject)) {
+			throw new IllegalArgumentException(obj.getName()
+					+ " Unsupported MapObject: "
+					+ obj.getClass().getName());
+		}
+
+		Body body = world.createBody(bodyDef
+				.reset()
+				.type(HandCardObject.BODY_TYPE)
+				.build());
+		Shape shape = createShape(obj, scale, body);
+		body.createFixture(fixtureDef.reset().shape(shape)
+				.friction(getFloatProperty(obj, "friction", HandCardObject.FRICTION))
+				.density(getFloatProperty(obj, "density", HandCardObject.DENSITY))
+				.restitution(getFloatProperty(obj, "restitution", HandCardObject.RESTITUTION))
+				.build());
+		// dispose after creating fixture
+		shape.dispose();
+		Vector2 d = getDimensions(obj);
+
+//		Sprite sprite = atlas.createSprite("back");
+	//	sprite.setScale(0.35f);
+		//Gdx.app.log("HandCardObject", "Loaded card: " + cardID);
+		
+		//SpriteGraphic graphic = new SpriteGraphic(1, 1, sprite);
+		
+		return new PhaseArea(body, scale, assetManager, d.x, d.y);
 		//return new HandCardObject(body, scale, assetManager, width, height);
 	}
 	

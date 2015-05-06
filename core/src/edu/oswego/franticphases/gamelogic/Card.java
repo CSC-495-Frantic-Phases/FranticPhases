@@ -37,6 +37,43 @@ public class Card {
       value = theValue;
       suit = theSuit;
    }
+   
+   public Card(String cardID) {
+	  // Gdx.app.log("NEW CARD", "id:" + cardID);
+	   
+	  if(cardID.contains("green")){
+		  suit = GREEN;
+		  cardID = cardID.replace("green", "");
+	  }else if(cardID.contains("yellow")){
+		  suit = YELLOW;
+		  cardID = cardID.replace("yellow", "");
+	  }else if(cardID.contains("red")){
+		  suit = RED;
+		  cardID = cardID.replace("red", "");
+	  }else if(cardID.contains("blue")){
+		  suit = BLUE;
+		  cardID = cardID.replace("blue", "");
+	  }else{
+		  suit = -1;
+		  
+	  }
+	  
+	  if(cardID.equals("W")){
+		  value = 13;
+	  }else if(cardID.equals("S")){
+		  value = 14;
+	  }else{
+		  value = Integer.parseInt(cardID);
+	  }
+	  
+//      if (theSuit != YELLOW && theSuit != GREEN && theSuit != BLUE && 
+//            theSuit != RED)
+//         throw new IllegalArgumentException("Illegal playing card suit");
+//      if ((theValue < 1 || theValue > 14))
+//         throw new IllegalArgumentException("Illegal playing card value");
+      
+      
+   }
 
    /**
     * Returns the suit of this card.

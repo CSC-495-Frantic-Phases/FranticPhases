@@ -7,19 +7,31 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 import edu.oswego.franticphases.FranticPhases;
 import edu.oswego.franticphases.datasending.GameHandler;
 import edu.oswego.franticphases.dialogs.PauseDialog;
+import edu.oswego.franticphases.gamelogic.Card;
 import edu.oswego.franticphases.gamelogic.Controller;
 import edu.oswego.franticphases.gamelogic.DebugPhaseRenderer;
 import edu.oswego.franticphases.gamelogic.DefaultPhaseRenderer;
+import edu.oswego.franticphases.gamelogic.Hand;
 import edu.oswego.franticphases.gamelogic.Phase;
 import edu.oswego.franticphases.gamelogic.PhaseRenderer;
 import edu.oswego.franticphases.gamelogic.Turn;
 import edu.oswego.franticphases.gamelogic.WorldPopulator;
 import edu.oswego.franticphases.objects.HandCardObject;
+import edu.oswego.franticphases.widgets.Hud;
 
 public class GameScreen extends AbstractScreen  {
 	InputMultiplexer inputMux = new InputMultiplexer();
@@ -31,13 +43,19 @@ public class GameScreen extends AbstractScreen  {
 	private PhaseRenderer renderer;
 	private final WorldPopulator worldPopulator;
 	private Phase phase;
-	
+	private Stage tmpStage;
+	ArrayList<HandCardObject> hand;
+	ArrayList<String> cards;
+	Hand myHand;
+	Hud hud;
 	
 	public GameScreen(FranticPhases game, GameHandler h) {
 		super(game);
-		//hud = new Hud(this, skin);
+		hud = new Hud(this, skin, game.getAssetManager());
 		assetManager = game.getAssetManager();
 		handler = h;
+		tmpStage = this.stage;
+		turn = new Turn();
 		
 		worldPopulator = new WorldPopulator(game.getAssetManager());
 		this.loadGameData();
@@ -60,37 +78,71 @@ public class GameScreen extends AbstractScreen  {
 		Gdx.app.log("GameScreen", "Cleaned up previous phase");
 		String num = handler.getPhaseNumber();//gotta load current phase from cardGame
 		phase = new Phase(num,
-				"phase.tmx",
+				game.getPhases().get(Integer.parseInt(num)),
 				worldPopulator, game.getAssetManager());
 		Gdx.app.log("GameScreen", "Phase loaded");
 		
-		ArrayList<HandCardObject> hand = phase.getHand();
-		ArrayList<String> cards = handler.getCards();
-		for(int i = 0; i < hand.size(); i++){
-			
-			hand.get(i).setGraphic(cards.get(i), stage);
-		}
-		phase.getfCard().setGraphic(handler.getFaceUpCard());
+		hand = phase.getHand();
+		cards = handler.getCards();
+		myHand = handler.getHand();
+		
 		
 		renderer = new DefaultPhaseRenderer(phase,
 				game.getWidth(), game.getHeight(),
 				game.getSpriteBatch(),
 				game.getAssetManager());
+		hud.setPhase(num);
+		hud.setScore(handler.getScore());
 	
 		//renderer = new DebugPhaseRenderer(renderer);
 		
+		
+		ScalingViewport svp = new ScalingViewport(Scaling.stretch, renderer.getCamera().viewportWidth,  renderer.getCamera().viewportHeight);
+		tmpStage = new Stage(svp, game.getSpriteBatch());
+		//tmpStage.setDebugAll(true);
+		
+		this.setHandGraphics();
+		this.setFaceupGraphic();
+		
+		//phase.setListeners(tmpStage, this);
+		
 		Gdx.app.log("GameScreen", "Renderer created");
-//		audio = new AudioManager(
-//				level,
-//				game.getSettings().isMusicOn(),
-//				game.getSettings().isSoundEffectOn(),
-//				game.getAssetManager());
-//		game.getSettings().addObserver(audio);
-//		Gdx.app.log("GameScreen", "Audio manager created");
-		//hud.setLevel(num + 1);
-
 		Gdx.app.log("GameScreen", "Phase starting...");
 	}
+	
+	
+	public void setHandGraphics(){
+		tmpStage.clear();
+		
+		ArrayList<Card> cardHand = myHand.getCards();
+		for(int i = 0; i < cardHand.size(); i++){
+			hand.get(i).setGraphic(cardHand.get(i).getCardID(), tmpStage, renderer.getCamera());
+		}
+		//this.setShuffleButton();
+		phase.setListeners(tmpStage, this);
+		
+		
+	}
+	
+	public void shuffle(){
+		if(myHand.isSortedByColor()){
+			myHand.sortByValue();
+		}else{
+			myHand.sortBySuit();
+		}
+		this.setHandGraphics();
+		this.addHud();
+	}
+	
+	private void addHud(){
+		tmpStage.addActor(hud);
+	}
+	
+	public void setFaceupGraphic(){
+		phase.getfCard().setGraphic(handler.getFaceUpCard());
+	}
+	
+	
 	
 	private void changeState(State state) {
 		System.out.println("GAME STATE CHANGED: "+ state.toString());
@@ -99,7 +151,7 @@ public class GameScreen extends AbstractScreen  {
 	@Override
 	protected void preStageRenderHook(float delta){
 		renderer.render(delta, game.getSpriteBatch(), game.getFont());
-		currentState.render(this, delta);
+		//currentState.render(this, delta);
 	}
 	
 	public void togglePause() {
@@ -133,6 +185,35 @@ public class GameScreen extends AbstractScreen  {
 		currentState.discard(this);
 	}
 	
+	public void pickUpCard(boolean wasFaceUp){
+		if(wasFaceUp){
+			myHand.addCard(new Card(handler.selectFaceUpCard()));
+			this.setHandGraphics();
+			this.setFaceupGraphic();
+			this.addHud();
+		}else{
+			myHand.addCard(new Card(handler.getDeckCard()));
+			this.setHandGraphics();
+			this.setFaceupGraphic();
+			this.addHud();
+		}
+	}
+	
+	@Override
+	public void render(float delta) {
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		preStageRenderHook(delta);
+		tmpStage.act(Gdx.graphics.getDeltaTime());
+		tmpStage.draw();
+		//postStageRenderHook(delta);
+	}
+	@Override
+	public void resize(int width, int height) {
+		
+	
+	}
+	
 	@Override
 	public void show() {
 		//set all the input processors here
@@ -140,7 +221,7 @@ public class GameScreen extends AbstractScreen  {
 		//then the game
 		//then the back button
 		Gdx.input.setInputProcessor(inputMux);
-		inputMux.addProcessor(stage);
+		inputMux.addProcessor(tmpStage);
 		
 		inputMux.addProcessor(new InputAdapter() {
 			@Override
@@ -152,6 +233,11 @@ public class GameScreen extends AbstractScreen  {
 				return super.keyDown(keycode);
 			}
 		});
+
+		hud.setPosition(0, 0);
+		hud.setHeight(32);
+		hud.setWidth(tmpStage.getWidth());
+		tmpStage.addActor(hud);
 		
 		currentState.show(this);
 	}
@@ -173,7 +259,7 @@ public class GameScreen extends AbstractScreen  {
 			}
 			@Override
 			public void pause(GameScreen s) {
-				s.pauseDialog = new PauseDialog("Paused", s.skin, s, s.game).show(s.stage);
+				s.pauseDialog = new PauseDialog("Paused", s.skin, s, s.game).show(s.tmpStage);
 				
 				s.changeState(State.PAUSED);
 			}
@@ -182,15 +268,7 @@ public class GameScreen extends AbstractScreen  {
 			public void togglePause(GameScreen s) {
 				pause(s);
 			}
-			@Override
-			public void render(GameScreen s, float delta) {
-				//s.discardLabel.setText(s.handler.getFaceUpCard());
-				if(s.handler.getIsTurn()){
-					
-					s.changeState(State.TAKINGTURN);
-					s.start();
-				}
-			}
+
 			@Override
 			public void refresh(GameScreen s){
 				
@@ -199,6 +277,11 @@ public class GameScreen extends AbstractScreen  {
 			@Override
 			public void faceUpCard(GameScreen s){
 				System.out.println("NOT YOUR TURN");
+				if(s.turn.canPickUp()){
+					s.pickUpCard(true);
+					
+					s.turn.pickedUp();
+				}
 			}
 			@Override
 			public void deck(GameScreen s){
@@ -218,7 +301,7 @@ public class GameScreen extends AbstractScreen  {
 
 			@Override
 			public void show(GameScreen s) {
-				s.pauseDialog = new PauseDialog("Paused", s.skin, s, s.game).show(s.stage);
+				s.pauseDialog = new PauseDialog("Paused", s.skin, s, s.game).show(s.tmpStage);
 			}
 
 			@Override
@@ -229,8 +312,7 @@ public class GameScreen extends AbstractScreen  {
 		TAKINGTURN {
 			@Override
 			public void pause(GameScreen s) {
-				s.pauseDialog = new PauseDialog("Paused", s.skin, s, s.game).show(s.stage);
-				
+				s.pauseDialog = new PauseDialog("Paused", s.skin, s, s.game).show(s.tmpStage);
 				s.changeState(State.PAUSED);
 			}
 
@@ -244,33 +326,23 @@ public class GameScreen extends AbstractScreen  {
 			}
 			
 			@Override
-			public void render(GameScreen s, float delta) {
-				if(!s.handler.getIsTurn()){
-					s.changeState(State.WAITING);
-				}
-			}
-			@Override
 			public void faceUpCard(GameScreen s){
 				//need to add card to hand if card not already taken
 				//then change the faceup card display to the one under it?
 				//System.out.println("YOUR TURN");
 				if(s.turn.canPickUp()){
-					System.out.println("YOU PICKED UP THE CARD");
-					s.handler.faceUpCardSelected();
+					s.pickUpCard(true);
+					
 					s.turn.pickedUp();
-				}else{
-					System.out.println("YOU ALREADY PICKED UP A CARD");
 				}
 			}
 			@Override
 			public void deck(GameScreen s){
 				//need to add card to hand if card not already taken
 				if(s.turn.canPickUp()){
-					System.out.println("YOU PICKED UP THE CARD");
-					s.handler.faceUpCardSelected();
+					s.pickUpCard(false);
+				
 					s.turn.pickedUp();
-				}else{
-					System.out.println("YOU ALREADY PICKED UP A CARD");
 				}
 			}
 			@Override
@@ -279,7 +351,7 @@ public class GameScreen extends AbstractScreen  {
 				//if you can then turn ended
 				if(s.turn.canDiscard()){
 					System.out.println("CARD DISCARDED");
-					s.handler.endTurn();
+					//s.handler.endTurn();
 				}else{
 					System.out.println("YOU NEED TO PICK UP FIRST");
 				}
@@ -297,7 +369,7 @@ public class GameScreen extends AbstractScreen  {
 		public void faceUpCard(GameScreen s) {}
 		public void refresh(GameScreen s) {}
 		public void resume(GameScreen s) {}
-		public void render(GameScreen s, float delta) {}
+		
 	}
 
 }

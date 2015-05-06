@@ -17,7 +17,7 @@ public class CardGame {
 	private String gameID;
 	private String deckID;
 	private String faceUpCard;
-	//private String faceDownCard;
+	private String deckCard = "back";
 	private String userPlayerNum;
 	
 	public CardGame(JsonValue json){
@@ -40,6 +40,10 @@ public class CardGame {
 			Player player = new Player(name, score, phase, playerNum);
 			players.add(player);
 		}
+	}
+	
+	public String getDeckCard(){
+		return deckCard;
 	}
 	
 	public CardGame(){

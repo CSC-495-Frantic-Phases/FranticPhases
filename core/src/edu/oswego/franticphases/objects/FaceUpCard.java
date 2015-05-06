@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 
+import edu.oswego.franticphases.gamelogic.FaceupListener;
 import edu.oswego.franticphases.gamelogic.UnitScale;
 import edu.oswego.franticphases.graphics.GraphicComponent;
 import edu.oswego.franticphases.graphics.SpriteGraphic;
@@ -19,7 +21,7 @@ import edu.oswego.franticphases.graphics.SpriteGraphic;
 	    public static final float DENSITY = 0.0f;
 	    public static final float RESTITUTION = 0.0f;
 	    public static final BodyType BODY_TYPE = BodyType.StaticBody;
-		private GraphicComponent graphic;
+		private SpriteGraphic graphic;
 		private boolean visible = true;
 		private final TextureAtlas atlas;
 		private final String soundFile = "data/soundfx/boing1.mp3";
@@ -36,12 +38,7 @@ import edu.oswego.franticphases.graphics.SpriteGraphic;
 			this.width = w;
 			this.height = h;
 			atlas = assetManager.get(atlasFile, TextureAtlas.class);
-			//String soundFile = "data/soundfx/boing1.mp3";
-//			if (!assetManager.isLoaded(soundFile)) {
-//				assetManager.load(soundFile, Sound.class);
-//				assetManager.finishLoading();
-//			}
-//			sound = assetManager.get(soundFile, Sound.class);
+			
 			
 		}
 		
@@ -51,8 +48,13 @@ import edu.oswego.franticphases.graphics.SpriteGraphic;
 			sprite.setScale(0.35f);
 			//Gdx.app.log("HandCardObject", "Loaded card: " + cardID);
 			
-			graphic = new SpriteGraphic(sprite);
+			graphic = new SpriteGraphic(getMapX(), getMapY(),sprite);
 			
+		}
+		
+		public void setListener(FaceupListener fl, Stage stage){
+			graphic.addListener(fl);
+			stage.addActor(graphic);
 		}
 		
 		public float getMapX() {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="17" height="12" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="background image" value="phasebackground.jpg"/>
+ </properties>
+ <layer name="Tile Layer 1" width="17" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUEAsAAzAAAQ==
+  </data>
+ </layer>
+ <objectgroup name="collision" width="17" height="12">
+  <object name="deck" x="456" y="117" width="54" height="76"/>
+  <object name="faceup" x="388" y="116" width="54" height="76"/>
+  <object name="card" x="1" y="246" width="49" height="69"/>
+  <object name="card" x="49" y="246" width="49" height="69"/>
+  <object name="card" x="97" y="246" width="49" height="69"/>
+  <object name="card" x="145" y="246" width="49" height="69"/>
+  <object name="card" x="193" y="246" width="49" height="69"/>
+  <object name="card" x="242" y="247" width="49" height="69"/>
+  <object name="card" x="289" y="247" width="49" height="69"/>
+  <object name="card" x="336" y="246" width="49" height="69"/>
+  <object name="card" x="383" y="246" width="49" height="69"/>
+  <object name="card" x="431" y="246" width="49" height="69"/>
+  <object name="card" x="483" y="246" width="49" height="69"/>
+  <object name="phase" x="287" y="116" width="54" height="76"/>
+  <object name="set1" x="28" y="111" width="40" height="57"/>
+  <object name="set1" x="74" y="111" width="40" height="57"/>
+  <object name="set1" x="123" y="111" width="40" height="57"/>
+  <object name="set2" x="28" y="175" width="40" height="57"/>
+  <object name="set2" x="75" y="176" width="40" height="57"/>
+  <object name="set2" x="123" y="176" width="40" height="57"/>
+ </objectgroup>
+</map>

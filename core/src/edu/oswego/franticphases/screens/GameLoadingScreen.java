@@ -3,6 +3,7 @@ package edu.oswego.franticphases.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -17,6 +18,7 @@ import edu.oswego.franticphases.datasending.GameHandler;
 import edu.oswego.franticphases.datasending.Handler;
 import edu.oswego.franticphases.datasending.WebCallback;
 import edu.oswego.franticphases.dialogs.LoginDialog;
+import edu.oswego.franticphases.dialogs.ServerErrorDialog;
 import edu.oswego.franticphases.gamelogic.CardGame;
 import edu.oswego.franticphases.settings.Settings;
 import edu.oswego.franticphases.widgets.LoadingBar;
@@ -36,6 +38,7 @@ public class GameLoadingScreen extends AbstractScreen{
     private GameHandler ghandler;
     private Handler handler;
     private WebCallback callBack;
+    private WebCallback callBack1;
 
     private Actor loadingBar;
     private String id;
@@ -49,6 +52,8 @@ public class GameLoadingScreen extends AbstractScreen{
         id = cardGame.getGameID();
         this.cardGame = cardGame;
         this.newGame = newGame;
+        callBack = new WebCallback();
+        callBack1 = new WebCallback();
     }
 
     @Override
@@ -89,14 +94,13 @@ public class GameLoadingScreen extends AbstractScreen{
 
 
         // Add everything to be loaded, for instance:
-		//manager.load("data/WorldObjects/worldObjects.txt", TextureAtlas.class);
-		
+		manager.load("data/WorldObjects/shuffle.png", Texture.class);
+		manager.load("data/ui/unpacked/PauseButton2.png", Texture.class);
         
     }
     
     private void createGame(){
     	if(!gameCreated){
-    	  callBack = new WebCallback();
 		  DataSender aSender = new DataSender();
 		  aSender.createGame(cardGame, callBack, handler);
 		  gameCreated = true;
@@ -106,7 +110,8 @@ public class GameLoadingScreen extends AbstractScreen{
     
     private void loadGame(){
     	if(!gameLoading){
-    	  ghandler.loadGame();
+    	  
+    	  ghandler.loadGame(callBack1);
     	  gameLoading = true;
     	}
     }
@@ -159,25 +164,37 @@ public class GameLoadingScreen extends AbstractScreen{
     	   		if(callBack.getResult()){//did we create the game
         	        newGame = false;
     	   			
-    	   		}else{//didnt login something went wrong
-        	   
+    	   		}else{//didnt create game something went wrong
+    	   			Dialog ld = new ServerErrorDialog("Create game failed.", skin, game, "Please try again later.").show(game
+    	   					.getStage());
     	   		}  
     	   	}
        }else{
     	   this.loadGame();
-    	   if(ghandler.isGameLoaded()){
+    	   if(callBack1.getRecieved()){//did game data return
+    	     if(callBack1.getResult()){//did we get the game data
     		   done = true;
+    	     }else{//nope something went wrong
+    		   Dialog ld = new ServerErrorDialog("Game load failed.", skin, game, "Please try again later.").show(game
+      					.getStage());
+    	     }
     	   }
        }
         
         // Interpolate the percentage to make it more smooth
        float status = 0;
        
-       if(callBack.getRecieved()){
-       	status += 0.25f;
-       }
-       if(ghandler.isGameLoaded()){
+       if(newGame){
+    	   if(callBack.getRecieved()){
+    		   status += 0.50f;
+    	   }
+    	   
+       }else{
     	   status += 0.50f;
+       }
+       
+       if(callBack1.getRecieved()){
+       	status += 0.50f;
        }
        									//start   end     a
        percent = Interpolation.linear.apply(percent, status, 0.1f);

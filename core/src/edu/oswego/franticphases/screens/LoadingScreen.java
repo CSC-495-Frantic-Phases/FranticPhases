@@ -103,6 +103,7 @@ public class LoadingScreen extends AbstractScreen{
         
 	
 		manager.load("data/WorldObjects/worldObjects.txt", TextureAtlas.class);
+		manager.load("data/WorldObjects/cards.txt", TextureAtlas.class);
         // game.manager.load("data/assets1.pack", TextureAtlas.class);
         // game.manager.load("data/assets2.pack", TextureAtlas.class);
         // game.manager.load("data/assets3.pack", TextureAtlas.class);
@@ -254,6 +255,7 @@ public class LoadingScreen extends AbstractScreen{
         if(callBack1.getResult() && callBack2.getResult() && callBack3.getResult()){
         	if (Gdx.input.isTouched()) {
         	  stage.clear();
+        	  game.setGameData(handler);
               game.showMainScreen();
         	}
         }

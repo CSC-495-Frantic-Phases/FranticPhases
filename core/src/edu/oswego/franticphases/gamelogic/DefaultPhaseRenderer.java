@@ -37,8 +37,8 @@ public class DefaultPhaseRenderer implements PhaseRenderer {
 		mapWidth = prop.get("width", Integer.class)
 				* prop.get("tilewidth", Integer.class);
 		mapHeight = (prop.get("height", Integer.class)
-				* prop.get("tileheight", Integer.class));
-				//+ 32; // adding extra for HUD
+				* prop.get("tileheight", Integer.class))
+				+ 32; // adding extra for HUD
 
 		camera = new OrthographicCamera();
 

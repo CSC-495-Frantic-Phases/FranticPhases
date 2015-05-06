@@ -12,14 +12,20 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Disposable;
 
 import edu.oswego.franticphases.objects.Audible;
+import edu.oswego.franticphases.objects.DeckObject;
 import edu.oswego.franticphases.objects.FaceUpCard;
 import edu.oswego.franticphases.objects.HandCardObject;
 import edu.oswego.franticphases.objects.MapRenderable;
+import edu.oswego.franticphases.objects.PhaseArea;
 import edu.oswego.franticphases.objects.WorldObject;
 import edu.oswego.franticphases.objects.WorldUpdateable;
+import edu.oswego.franticphases.screens.GameScreen;
 
 
 public class Phase implements Disposable, Audible {
@@ -47,19 +53,21 @@ public class Phase implements Disposable, Audible {
 	private final Collection<Audible> audibleObjects;
 	private ArrayList<HandCardObject> hand;
 	private FaceUpCard faceupCard;
-
+	private DeckObject deckObject;
+	private PhaseArea phaseArea;
+	
 	public Phase(String phase, String filename, 
 			WorldPopulator populator, AssetManager assetManager) {
 		this.phase = phase;
 		currentState = State.NOT_STARTED;
 
-		map = loadMap("phase.tmx");
+		map = loadMap(filename);
 
 		mapWidth = map.getProperties().get("width", Integer.class)
 				* map.getProperties().get("tilewidth", Integer.class);
 		mapHeight = (map.getProperties().get("height", Integer.class)
-				* map.getProperties().get("tileheight", Integer.class));
-				//+ 32; // adding extra for HUD
+				* map.getProperties().get("tileheight", Integer.class))
+				+ 32; // adding extra for HUD
 
 		disposableObjects = new LinkedList<Disposable>();
 		renderableObjects = new LinkedList<MapRenderable>();
@@ -70,13 +78,8 @@ public class Phase implements Disposable, Audible {
 
 		hand = populator.populateWorldFromMap(this, map, world, scale);
 		faceupCard = populator.getfCard();
-//		playSound = true;
-//		String soundFile = "data/soundfx/failure-2.mp3";
-//		if (!assetManager.isLoaded(soundFile)) {
-//			assetManager.load(soundFile, Sound.class);
-//			assetManager.finishLoading();
-//		}
-//		failSound = assetManager.get(soundFile, Sound.class);
+		deckObject = populator.getDeck();
+		phaseArea = populator.getPArea();
 
 		//contactListener = new OurCollisionListener();
 		//world.setContactListener(contactListener);
@@ -84,6 +87,25 @@ public class Phase implements Disposable, Audible {
 	
 	public FaceUpCard getfCard(){
 		return faceupCard;
+	}
+	
+	public DeckObject getDeck(){
+		return deckObject;
+	}
+	
+	public void setListeners(Stage stage, final GameScreen screen){
+		faceupCard.setListener(new FaceupListener(screen), stage);
+		deckObject.setListener(new DeckListener(screen), stage);
+		phaseArea.setListener(new ClickListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				Gdx.app.log("Phase Area", "clicked");
+				//screen.shuffle();
+				return true;
+			}
+			
+		}, stage);
 	}
 
 	public TiledMap getMap() {

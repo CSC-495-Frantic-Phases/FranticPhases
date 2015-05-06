@@ -40,16 +40,11 @@ public class FranticPhases extends Game implements SettingsObserver{
 	Stack<Screen> screenStack = new Stack<Screen>();
 	private final List<String> phases = new ArrayList<String>();
 	{
-		phases.add("phase.tmx");//1
-//		phases.add("two.tmx");//2
-//		phases.add("three.tmx");//3
-//		phases.add("four.tmx");//4
-//		phases.add("five.tmx");//5
-//		phases.add("six.tmx");//6
-//		phases.add("seven.tmx");//7
-//		phases.add("eight.tmx");//8
-//		phases.add("nine.tmx");//9
-//		phases.add("ten.tmx");//10
+		phases.add("phase1.tmx");
+		phases.add("phase2.tmx");
+		phases.add("phase3.tmx");
+		phases.add("phase4.tmx");
+
 
 
 	}
@@ -92,6 +87,7 @@ public class FranticPhases extends Game implements SettingsObserver{
 		height = 320;//320
 		ScalingViewport svp = new ScalingViewport(Scaling.stretch, width, height);
 		stage = new Stage(svp, batch);
+		//stage.setDebugAll(true);
 		
 		this.loadGameData();
 	}
@@ -117,6 +113,11 @@ public class FranticPhases extends Game implements SettingsObserver{
 	}
 	public BitmapFont getFont() {
 		return font;
+	}
+	
+	public void setGameData(Handler handler){
+		this.allMyGames = handler.getGames();
+		this.users = handler.getUsers();
 	}
 	
 	public void showMainScreen() {

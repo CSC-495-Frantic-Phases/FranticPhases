@@ -1,30 +1,17 @@
 package edu.oswego.franticphases.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 
 public class SpriteGraphic extends Actor implements GraphicComponent  {
 	private final Sprite sprite;
 
-	public SpriteGraphic(Sprite sprite) {
+	public SpriteGraphic(float x, float y, Sprite sprite) {
 		this.sprite = sprite;
-		setBounds(sprite.getX(),sprite.getY(),sprite.getWidth(),sprite.getHeight());
-        setTouchable(Touchable.enabled);
-
-//        this.addListener(new InputListener(){
-//        	@Override
-//            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-//            	Gdx.app.log("sdfcs", "touch dragged");
-//                return true;
-//            }
-//        });
+		setBounds(x -(sprite.getOriginX()/2)+15, y - (sprite.getOriginY()/2)+20,(sprite.getWidth()*0.35f),(sprite.getHeight()*0.35f));
+		setTouchable(Touchable.enabled);
 	}
 
 	@Override
@@ -33,6 +20,7 @@ public class SpriteGraphic extends Actor implements GraphicComponent  {
 	@Override
 	public void setPosition(float x, float y) {
 		sprite.setPosition(x - sprite.getOriginX(), y - sprite.getOriginY());
+		
 	}
     @Override
     protected void positionChanged() {

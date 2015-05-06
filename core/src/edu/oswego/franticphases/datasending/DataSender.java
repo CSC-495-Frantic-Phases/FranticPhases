@@ -334,7 +334,7 @@ public class DataSender {
 	        		JsonReader jr = new JsonReader();
 	        		JsonValue jsonVal = jr.parse(is);
 	        		parseAckData(jsonVal, _theCallback);
-	        		handler.toggleNextPlayer();
+	        		//handler.toggleNextPlayer();
 
 		        }
 		 

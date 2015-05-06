@@ -1,23 +1,30 @@
 package edu.oswego.franticphases.objects;
 
-	import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 
+import edu.oswego.franticphases.collisionListener.CardCollisionListener;
+import edu.oswego.franticphases.gamelogic.DeckListener;
 import edu.oswego.franticphases.gamelogic.UnitScale;
 import edu.oswego.franticphases.graphics.GraphicComponent;
+import edu.oswego.franticphases.graphics.SpriteGraphic;
 
 
-	public class DeckObject extends AbstractWorldObject implements Disposable, Audible, MapRenderable {
+
+	public class DeckObject extends AbstractWorldObject implements  Disposable, Audible, MapRenderable {
 
 		public static final float FRICTION = 0.0f;
 	    public static final float DENSITY = 0.0f;
 	    public static final float RESTITUTION = 0.0f;
 	    public static final BodyType BODY_TYPE = BodyType.StaticBody;
-		private GraphicComponent graphic;
+		private SpriteGraphic graphic;
 		private boolean visible = true;
 		private final TextureAtlas atlas;
 		private final String soundFile = "data/soundfx/boing1.mp3";
@@ -27,20 +34,29 @@ import edu.oswego.franticphases.graphics.GraphicComponent;
 		private float height;
 		//private final Sound sound;
 		
-		public DeckObject(Body body,GraphicComponent graphic, UnitScale scale , AssetManager assetManager, float w, float h) {
+		public DeckObject(Body body, UnitScale scale , AssetManager assetManager, float w, float h) {
 			super(body);
 			this.scale = scale;
-			this.graphic = graphic;
+			this.graphic = null;
 			this.width = w;
 			this.height = h;
 			atlas = assetManager.get(atlasFile, TextureAtlas.class);
-			//String soundFile = "data/soundfx/boing1.mp3";
-//			if (!assetManager.isLoaded(soundFile)) {
-//				assetManager.load(soundFile, Sound.class);
-//				assetManager.finishLoading();
-//			}
-//			sound = assetManager.get(soundFile, Sound.class);
 			
+		}
+		
+		public void setGraphic(String cardID){
+			Sprite sprite = atlas.createSprite(cardID);
+			sprite.setScale(0.35f);
+			//Gdx.app.log("HandCardObject", "Loaded card: " + cardID);
+			
+			graphic = new SpriteGraphic(getMapX(), getMapY(),sprite);
+			
+		}
+		
+		public void setListener(DeckListener dl, Stage stage){
+			
+			graphic.addListener(dl);
+			stage.addActor(graphic);
 		}
 	
 		
@@ -88,6 +104,8 @@ import edu.oswego.franticphases.graphics.GraphicComponent;
 			graphic.draw(delta, batch);
 			
 		}
+
+
 
 	}
 

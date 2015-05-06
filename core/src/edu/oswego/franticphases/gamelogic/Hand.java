@@ -12,6 +12,7 @@ public class Hand {
 	private String handID;
 	private ArrayList<Card> cards;   // The cards in the hand.
 	private ArrayList<String> cardsAsStrings;
+	boolean sortedByColor = false;
 
     public Hand() {
         cards = new ArrayList<Card>();
@@ -20,30 +21,40 @@ public class Hand {
     
 	public Hand(JsonValue json){
 		cardsAsStrings = new ArrayList<String>();
+		cards = new ArrayList<Card>();
 		for(int i = 0; i < json.size; i++){
 			JsonValue tmp = json.get(i);
 			handID = tmp.getString("handID");
 			
 			String cardID = tmp.getString("card01");
-			
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card02");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card03");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card04");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card05");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card06");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card07");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card08");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card09");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			cardID = tmp.getString("card10");
+			cards.add(new Card(cardID));
 			cardsAsStrings.add(cardID);
 			
 			Gdx.app.log("Hand", "Loaded handID: " + handID);
@@ -136,6 +147,7 @@ public class Hand {
             newHand.add(c);
         }
         cards = newHand;
+        sortedByColor = true;
     }
 
     /**
@@ -160,6 +172,11 @@ public class Hand {
             newHand.add(c);
         }
         cards = newHand;
+        sortedByColor = false;
+    }
+    
+    public boolean isSortedByColor(){
+    	return sortedByColor;
     }
 	
 	

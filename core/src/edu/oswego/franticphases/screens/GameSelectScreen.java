@@ -69,6 +69,57 @@ public class GameSelectScreen extends AbstractScreen  {
 		ScrollPane scroll = new ScrollPane(gameData, skin);
 		gameData.add("All of your current games!!!").padRight(25).padLeft(25);
 		table.add(scroll).expandY().padTop(20).padBottom(10);
+		if(games.size()>0){
+		
+		gameData.row();
+		gameData.add("Select a game to play!").padRight(50).padLeft(50);
+		int index = 1;
+		for(int i = 0; i < games.size();i++){
+	
+			gameData.row();
+			CheckBox box = new CheckBox("" ,skin);
+			final int tmp = i;
+			box.addListener(new ChangeListener(){
+
+				@Override
+				public void changed(ChangeEvent event, Actor actor) {
+					if(selectedGame == null){
+						selectedGame= games.get(tmp);		
+					}else{
+					selectedGame = null;
+					
+					}
+				}
+			});
+			String p1 = games.get(i).getP1();
+			StringBuilder string = new StringBuilder();
+			if(!p1.equals(Settings.getUsername())){
+				string.append(p1).append(", ");
+			}
+			p1 = games.get(i).getP2();
+			if(!p1.equals(Settings.getUsername())){
+				string.append(p1).append(", ");
+			}
+			p1 = games.get(i).getP3();
+			if(!p1.equals(Settings.getUsername())){
+				string.append(p1).append(", ");
+			}
+			p1 = games.get(i).getP4();
+			if(!p1.equals(Settings.getUsername())){
+				string.append(p1).append("");
+			}
+			
+			gameData.add(index+" : With " + string.toString());
+			index++;
+			gameData.add(box).padRight(50);
+			}
+		
+		}else{
+			gameData.row();
+			gameData.add("You are not currently in any games!").padRight(25).padLeft(25);
+			gameData.row();
+			gameData.add("Please create a game below!").padRight(25).padLeft(25);
+		}
 		
 		table.row();
 		Button newGame = new TextButton("New Game", skin);
@@ -101,69 +152,10 @@ public class GameSelectScreen extends AbstractScreen  {
 	}
 	@Override
 	protected void preStageRenderHook(float delta){
-		
-		if(games.size()>0){
-		gameData.clear();
-		gameData.row();
-		gameData.add("Select a game to play!").padRight(50).padLeft(50);
-		int index = 1;
-		for(int i = 0; i < games.size();i++){
-	
-			gameData.row();
-			CheckBox box = new CheckBox("" ,skin);
-			final int tmp = i;
-			box.addListener(new ChangeListener(){
-
-				@Override
-				public void changed(ChangeEvent event, Actor actor) {
-					if(selectedGame == null){
-						selectedGame= games.get(tmp);
-						
-					}else{
-					selectedGame = null;
-					
-					}
-					
-				}
-				
-			});
-			String p1 = games.get(i).getP1();
-			StringBuilder string = new StringBuilder();
-			if(!p1.equals(Settings.getUsername())){
-				string.append(p1).append(", ");
-			}
-			p1 = games.get(i).getP2();
-			if(!p1.equals(Settings.getUsername())){
-				string.append(p1).append(", ");
-			}
-			p1 = games.get(i).getP3();
-			if(!p1.equals(Settings.getUsername())){
-				string.append(p1).append(", ");
-			}
-			p1 = games.get(i).getP4();
-			if(!p1.equals(Settings.getUsername())){
-				string.append(p1).append("");
-			}
-			
-			
-			gameData.add(index+" : With " + string.toString());
-			index++;
-			gameData.add(box).padRight(50);
-			}
-		
-		}else{
-			gameData.row();
-			gameData.add("You are not currently in any games!").padRight(25).padLeft(25);
-			gameData.row();
-			gameData.add("Please create a game below!").padRight(25).padLeft(25);
-		}
 		if(selectedGame == null){
 			playGame.setVisible(false);
 		}else{
 			playGame.setVisible(true);
 		}
-		
-
 	}
-
 }

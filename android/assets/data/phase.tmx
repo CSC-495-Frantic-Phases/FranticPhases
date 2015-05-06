@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="23" height="13" tilewidth="32" tileheight="32">
  <properties>
-  <property name="background image" value="dark.jpg"/>
+  <property name="background image" value="phasebackground.jpg"/>
  </properties>
  <tileset firstgid="1" name="grass-tiles-2-small" tilewidth="32" tileheight="32">
   <image source="grass-tiles-2-small.png" width="384" height="192"/>
@@ -12,16 +12,16 @@
   </data>
  </layer>
  <objectgroup name="collision" width="23" height="13">
-  <object name="card" x="18" y="323" width="54" height="76"/>
-  <object name="card" x="234" y="325" width="54" height="76"/>
-  <object name="card" x="89" y="324" width="54" height="76"/>
-  <object name="card" x="161" y="324" width="54" height="76"/>
-  <object name="card" x="310" y="325" width="54" height="76"/>
-  <object name="card" x="379" y="325" width="54" height="76"/>
-  <object name="card" x="448" y="325" width="54" height="76"/>
-  <object name="card" x="523" y="323" width="54" height="76"/>
-  <object name="card" x="667" y="323" width="56" height="75"/>
-  <object name="card" x="597" y="324" width="54" height="76"/>
+  <object name="card" x="111" y="320" width="54" height="76"/>
+  <object name="card" x="300" y="319" width="54" height="76"/>
+  <object name="card" x="174" y="320" width="54" height="76"/>
+  <object name="card" x="238" y="320" width="54" height="76"/>
+  <object name="card" x="362" y="319" width="54" height="76"/>
+  <object name="card" x="425" y="319" width="54" height="76"/>
+  <object name="card" x="488" y="319" width="54" height="76"/>
+  <object name="card" x="551" y="320" width="54" height="76"/>
+  <object name="card" x="675" y="320" width="56" height="75"/>
+  <object name="card" x="613" y="319" width="54" height="76"/>
   <object name="deck" x="606" y="160" width="71" height="95"/>
   <object name="faceup" x="515" y="161" width="71" height="95"/>
   <object name="phase" x="320" y="162" width="71" height="95"/>

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import edu.oswego.franticphases.gamelogic.Card;
 import edu.oswego.franticphases.gamelogic.CardGame;
 import edu.oswego.franticphases.gamelogic.Hand;
+import edu.oswego.franticphases.gamelogic.Player;
 import edu.oswego.franticphases.screens.GameScreen;
 import edu.oswego.franticphases.widgets.Hud;
 
@@ -31,6 +32,17 @@ public class GameHandler {
 	public void update() {
 		//this.checkIsTurn();
 		//this.updateFaceUpCard();
+	}
+	
+	public ArrayList<Player> getPlayers(){
+		ArrayList<Player> retArray = new ArrayList<Player>();
+		for(Player p:game.getPlayers()){
+			if(p.getID()!=game.getUserPlayerNum()){
+				retArray.add(p);
+			}
+		}
+		return retArray;
+		
 	}
 	
 	public String selectFaceUpCard(){

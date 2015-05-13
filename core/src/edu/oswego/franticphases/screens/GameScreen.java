@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -28,10 +29,12 @@ import edu.oswego.franticphases.gamelogic.DefaultPhaseRenderer;
 import edu.oswego.franticphases.gamelogic.Hand;
 import edu.oswego.franticphases.gamelogic.Phase;
 import edu.oswego.franticphases.gamelogic.PhaseRenderer;
+import edu.oswego.franticphases.gamelogic.Player;
 import edu.oswego.franticphases.gamelogic.Turn;
 import edu.oswego.franticphases.gamelogic.WorldPopulator;
 import edu.oswego.franticphases.objects.HandCardObject;
 import edu.oswego.franticphases.widgets.Hud;
+import edu.oswego.franticphases.widgets.PlayerDisplay;
 
 public class GameScreen extends AbstractScreen  {
 	InputMultiplexer inputMux = new InputMultiplexer();
@@ -44,20 +47,28 @@ public class GameScreen extends AbstractScreen  {
 	private final WorldPopulator worldPopulator;
 	private Phase phase;
 	private Stage tmpStage;
-	ArrayList<HandCardObject> hand;
-	ArrayList<String> cards;
-	Hand myHand;
-	Hud hud;
+	private ArrayList<HandCardObject> hand;
+	private ArrayList<Player> players;
+	
+	private Hand myHand;
+	private Hud hud;
+	private PlayerDisplay playerDisplay;
+	boolean isTurn;
+	boolean isDragging;
 	
 	public GameScreen(FranticPhases game, GameHandler h) {
 		super(game);
 		hud = new Hud(this, skin, game.getAssetManager());
+		playerDisplay = new PlayerDisplay(this, skin, game.getAssetManager());
 		assetManager = game.getAssetManager();
 		handler = h;
 		tmpStage = this.stage;
 		turn = new Turn();
-		
+		players = handler.getPlayers();
 		worldPopulator = new WorldPopulator(game.getAssetManager());
+		game.getSpriteBatch().enableBlending();
+		isTurn = handler.getIsTurn();
+		isDragging = false;
 		this.loadGameData();
 	}
 	
@@ -83,7 +94,7 @@ public class GameScreen extends AbstractScreen  {
 		Gdx.app.log("GameScreen", "Phase loaded");
 		
 		hand = phase.getHand();
-		cards = handler.getCards();
+		
 		myHand = handler.getHand();
 		
 		
@@ -120,7 +131,7 @@ public class GameScreen extends AbstractScreen  {
 		}
 		//this.setShuffleButton();
 		phase.setListeners(tmpStage, this);
-		
+		tmpStage.addActor(playerDisplay);
 		
 	}
 	
@@ -239,6 +250,19 @@ public class GameScreen extends AbstractScreen  {
 		hud.setWidth(tmpStage.getWidth());
 		tmpStage.addActor(hud);
 		
+		playerDisplay.setPosition(0, tmpStage.getHeight());
+		playerDisplay.setHeight(64);
+		playerDisplay.setWidth(tmpStage.getWidth());
+		
+		playerDisplay.setPlayer1Data(players.get(0));
+		playerDisplay.setPlayer2Data(players.get(1));
+		playerDisplay.setPlayer3Data(players.get(2));
+		
+		//playerDisplay.setColor(new Color(0, 1, 0, 0.5f));
+		
+		
+		tmpStage.addActor(playerDisplay);
+		
 		currentState.show(this);
 	}
 	
@@ -277,11 +301,7 @@ public class GameScreen extends AbstractScreen  {
 			@Override
 			public void faceUpCard(GameScreen s){
 				System.out.println("NOT YOUR TURN");
-				if(s.turn.canPickUp()){
-					s.pickUpCard(true);
-					
-					s.turn.pickedUp();
-				}
+				
 			}
 			@Override
 			public void deck(GameScreen s){
